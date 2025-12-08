@@ -193,6 +193,24 @@
       <button id="connectBtn">Conectar MetaMask</button>
     </div>
 
+
+    <!-- Seleção de Ativos -->
+    <div class="card">
+      <div class="input-box">
+        <label for="assetSelect">Selecione seu ativo:</label>
+        <select id="assetSelect">
+          <option value="">Selecione um ativo</option>
+          <option value="nix_ore" data-nix="10" data-label="NIX-ALOT Ore">NIX-ALOT Ore</option>
+          <option value="nix_craft" data-nix="50" data-label="NIX-ALOT Craft">NIX-ALOT Craft</option>
+          <option value="nix_redstone" data-nix="100" data-label="NIX-ALOT Redstone">NIX-ALOT Redstone</option>
+          <option value="nix_diamond" data-nix="200" data-label="NIX-ALOT Diamond">NIX-ALOT Diamond</option>
+          <option value="nix_gold" data-nix="150" data-label="NIX-ALOT Gold">NIX-ALOT Gold</option>
+          <option value="nix_emerald" data-nix="300" data-label="NIX-ALOT Emerald">NIX-ALOT Emerald</option>
+          <option value="nix_lapis" data-nix="80" data-label="NIX-ALOT Lapis">NIX-ALOT Lapis</option>
+          <option value="nix_netherite" data-nix="500" data-label="NIX-ALOT Netherite">NIX-ALOT Netherite</option>
+        </select>
+      </div>
+    </div>
     <!-- Ticker horizontal -->
     <div class="card">
       <div class="ticker-horizontal">
@@ -292,16 +310,7 @@ async function updateTicker() {
   }
 
   // Supondo que você tenha uma lista de ativos
-  const assets = {
-    "NIX-ALOT Ore": 2,
-    "NIX-ALOT Craft": 5,
-    "NIX-ALOT Redstone": 10,
-    "NIX-ALOT Diamond": 20,
-    "NIX-ALOT Gold": 15,
-    "NIX-ALOT Emerald": 30,
-    "NIX-ALOT Lapis": 8,
-    "NIX-ALOT Netherite": 50
-  };
+c
 
   for (const [label, assetValue] of Object.entries(assets)) {
     const priceInBRL = (assetValue * dollarPrice).toFixed(2);
