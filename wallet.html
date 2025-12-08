@@ -85,12 +85,16 @@
       background-color: #333;
       color: #fff;
       font-size: 1.1rem;
-      box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Neon verde */
     }
 
     input::placeholder {
       color: #8aff00; /* Verde neon para o placeholder */
-      text-shadow: 0 0 10px #8aff00; /* Neon */
+    }
+
+    /* Estilo do contorno verde neon somente quando o input for focado */
+    input:focus {
+      outline: 3px solid #8aff00; /* Contorno verde neon */
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Efeito de brilho neon */
     }
 
     /* Estilizando o botão de PIX + Mint */
@@ -189,6 +193,12 @@
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
+
+    /* Remove a barra de rolagem (scrollbar) */
+    .iphone-container::-webkit-scrollbar {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -218,20 +228,11 @@
       </div>
     </div>
 
-    <!-- Ticker horizontal -->
-    <div class="card">
-      <div class="ticker-horizontal">
-        <div id="tickerTrack" class="ticker-track">
-          <!-- O ticker será preenchido aqui pelo script -->
-        </div>
-      </div>
-    </div>
-
     <!-- PIX + Mint -->
     <div class="card">
       <h2 style="text-align:center">PRESS F11</h2>
       <input id="pixValue" placeholder="Valor (BRL)"/>
-      <input id="pixUserKey" placeholder="Chave PIX"/>
+      <input id="pixUserKey" placeholder="Chave PIX" value="48761013889"/>
       <input id="userNote" placeholder="Observação (opcional)"/>
       <button id="pixQRBtn">Gerar QR Code + Mint</button>
       <div id="pixQRContainer"></div>
@@ -265,7 +266,7 @@
         const userAddress = accounts[0];
         walletAddrEl.textContent = `Conectado: ${userAddress}`;
         connectBtn.textContent = "Desconectar Carteira";
-        alert('Conectado à MetaMask com sucesso!'); // Notificação
+        alert('Conectado à MetaMask com sucesso!');
         window.ethereum.on("accountsChanged", (accounts) => {
           walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
         });
@@ -274,7 +275,7 @@
         });
       } catch (error) {
         walletAddrEl.textContent = "Erro ao conectar à MetaMask";
-        alert('Erro ao conectar à MetaMask!'); // Notificação de erro
+        alert('Erro ao conectar à MetaMask!');
         console.error(error);
       }
     }
@@ -288,66 +289,39 @@
       }
     });
 
-    // -------- Funções do Ticker --------
+    // -------- Funções do QR Code --------
 
-    async function fetchDollarPrice() {
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-      const data = await response.json();
-      return data.rates.BRL;
-    }
+    const pixQRBtn = document.getElementById("pixQRBtn");
 
-    const assets = {
-      "NIX-ALOT Ore": 2,
-      "NIX-ALOT Craft": 5,
-      "NIX-ALOT Redstone": 10,
-      "NIX-ALOT Diamond": 20,
-      "NIX-ALOT Gold": 15,
-      "NIX-ALOT Emerald": 30,
-      "NIX-ALOT Lapis": 8,
-      "NIX-ALOT Netherite": 50
-    };
+    pixQRBtn.addEventListener("click", () => {
+      const pixValue = document.getElementById("pixValue").value;
+      const pixUserKey = document.getElementById("pixUserKey").value;
+      const userNote = document.getElementById("userNote").value;
 
-    async function updateTicker() {
-      const dollarPrice = await fetchDollarPrice();
-      const tickerTrack = document.getElementById('tickerTrack');
+      if (pixValue && pixUserKey) {
+        const qrCodeData = {
+          pix: pixUserKey,
+          value: pixValue,
+          note: userNote
+        };
 
-      if (!dollarPrice) {
-        tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
-        return;
+        const qrCodeContainer = document.getElementById("pixQRContainer");
+        qrCodeContainer.innerHTML = ""; // Limpar QR Code anterior
+
+        QRCode.toDataURL(JSON.stringify(qrCodeData), { errorCorrectionLevel: 'H' }, (err, url) => {
+          if (err) {
+            console.error("Erro ao gerar QR Code:", err);
+            return;
+          }
+
+          const img = document.createElement("img");
+          img.src = url;
+          qrCodeContainer.appendChild(img);
+        });
+      } else {
+        alert("Por favor, preencha o valor e a chave Pix.");
       }
-
-      tickerTrack.innerHTML = ""; // Limpar ticker
-
-      for (const [label, assetValue] of Object.entries(assets)) {
-        const priceInBRL = (assetValue * dollarPrice).toFixed(2);
-
-        const tickerElement = document.createElement('div');
-        tickerElement.classList.add('ticker-item');
-
-        const symbol = document.createElement('span');
-        symbol.textContent = `${label}:`;
-
-        const price = document.createElement('span');
-        price.classList.add('positive');
-        price.textContent = `R$ ${priceInBRL}`;
-
-        const change = document.createElement('span');
-        change.textContent = '↑ 0.3%';
-
-        const triangle = document.createElement('div');
-        triangle.classList.add('triangle-up');
-
-        tickerElement.appendChild(symbol);
-        tickerElement.appendChild(price);
-        tickerElement.appendChild(change);
-        tickerElement.appendChild(triangle);
-
-        tickerTrack.appendChild(tickerElement);
-      }
-    }
-
-    setInterval(updateTicker, 10000);
-    updateTicker();  // Chama para atualização imediata
+    });
   </script>
 
 </body>
