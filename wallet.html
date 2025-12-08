@@ -346,7 +346,69 @@ async function updateTicker() {
 
     tickerTrack.appendChild(tickerElement);
   }
+// -------- Funções do Ticker --------
+
+// Função para buscar o valor do Dólar em tempo real
+async function fetchDollarPrice() {
+  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+  const data = await response.json();
+  return data.rates.BRL;
 }
+
+// Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
+async function updateTicker() {
+  const dollarPrice = await fetchDollarPrice();
+  const tickerTrack = document.getElementById('tickerTrack');
+
+  if (!dollarPrice) {
+    tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
+    return;
+  }
+
+  // Supondo que você tenha uma lista de ativos
+  const assets = {
+    "NIX-ALOT Ore": 2,
+    "NIX-ALOT Craft": 5,
+    "NIX-ALOT Redstone": 10,
+    "NIX-ALOT Diamond": 20,
+    "NIX-ALOT Gold": 15,
+    "NIX-ALOT Emerald": 30,
+    "NIX-ALOT Lapis": 8,
+    "NIX-ALOT Netherite": 50
+  };
+
+  for (const [label, assetValue] of Object.entries(assets)) {
+    const priceInBRL = (assetValue * dollarPrice).toFixed(2);
+
+    const tickerElement = document.createElement('div');
+    tickerElement.classList.add('ticker-item');
+
+    const symbol = document.createElement('span');
+    symbol.textContent = `${label}:`;
+
+    const price = document.createElement('span');
+    price.classList.add('positive');
+    price.textContent = `R$ ${priceInBRL}`;
+
+    const change = document.createElement('span');
+    change.textContent = '↑ 0.3%';  // Pode ser ajustado para mostrar variações reais
+
+    const triangle = document.createElement('div');
+    triangle.classList.add('triangle-up');
+
+    tickerElement.appendChild(symbol);
+    tickerElement.appendChild(price);
+    tickerElement.appendChild(change);
+    tickerElement.appendChild(triangle);
+
+    tickerTrack.appendChild(tickerElement);
+  }
+}
+
+// Atualizar o ticker a cada 10 segundos
+setInterval(updateTicker, 10000);
+updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
+
 
 // Atualizar o ticker a cada 10 segundos
 setInterval(updateTicker, 10000);
