@@ -248,7 +248,7 @@ const walletAddrEl = document.getElementById("walletAddr");
 // Verificar se o MetaMask está instalado
 if (typeof window.ethereum === "undefined") {
   connectBtn.disabled = true;
-  walletAddrEl.textContent = "MetaMask não detectado. ";
+  walletAddrEl.textContent = "MetaMask não detectado.";
 }
 
 // Função para conectar a MetaMask
@@ -299,6 +299,13 @@ async function fetchDollarPrice() {
   return data.rates.BRL;
 }
 
+// Exemplo de ativos com seus valores em USD
+const assets = {
+  "Bitcoin": 30000,  // Exemplo de valor do Bitcoin em USD
+  "Ethereum": 1800,  // Exemplo de valor do Ethereum em USD
+  "Litecoin": 100    // Exemplo de valor do Litecoin em USD
+};
+
 // Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
 async function updateTicker() {
   const dollarPrice = await fetchDollarPrice();
@@ -309,9 +316,10 @@ async function updateTicker() {
     return;
   }
 
-  // Supondo que você tenha uma lista de ativos
-c
+  // Limpar os elementos existentes no ticker
+  tickerTrack.innerHTML = "";
 
+  // Atualizar o ticker com os valores dos ativos
   for (const [label, assetValue] of Object.entries(assets)) {
     const priceInBRL = (assetValue * dollarPrice).toFixed(2);
 
@@ -345,5 +353,6 @@ setInterval(updateTicker, 10000);
 updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
 
 </script>
+
 </body>
 </html>
