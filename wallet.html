@@ -148,45 +148,42 @@
     }
   }
 </style>
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
 </head>
 
 <body>
-<div class="container">
-  <h1>ENDERMAN CHEERS WALLET</h1>
+  <div class="iphone-container">
+    <h1>ENDERMAN CHEERS WALLET</h1>
 
-  <!-- Conectar Carteira -->
-  <div class="card">
-    <button id="connectBtn">Conectar Carteira</button>
-    <div id="walletAddr" class="small">Status: desconectado</div>
+    <!-- Conectar Carteira -->
+    <div class="card">
+      <button id="connectBtn">Conectar Carteira</button>
+      <div id="walletAddr" class="small">Status: desconectado</div>
+    </div>
+
+    <!-- PIX + Mint -->
+    <div class="card">
+      <h2 style="text-align:center">APOLO26</h2>
+      <input id="pixValue" placeholder="Valor (BRL)"/>
+      <input id="pixUserKey" placeholder="Chave PIX"/>
+      <input id="userNote" placeholder="Observação (opcional)"/>
+      <button id="pixQRBtn">Gerar QR Code + Mint</button>
+      <div id="pixQRContainer"></div>
+    </div>
+
+    <!-- Logs -->
+    <div class="card">
+      <h2 style="text-align:center">Logs</h2>
+      <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
+    </div>
+
+    <!-- Guardian GX -->
+    <div class="card">
+      <h2 style="text-align:center; color:#1db954;">TAUROS V5  - Trade 2026</h2>
+    </div>
+
+    <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
   </div>
-
-  <!-- PIX + Mint -->
-  <div class="card">
-    <h2 style="text-align:center">APOLO26</h2>
-    <input id="pixValue" placeholder="Valor (BRL)"/>
-    <input id="pixUserKey" placeholder="Chave PIX"/>
-    <input id="userNote" placeholder="Observação (opcional)"/>
-    <button id="pixQRBtn">Gerar QR Code + Mint</button>
-    <div id="pixQRContainer"></div>
-  </div>
-
-  <!-- Logs -->
-  <div class="card">
-    <h2 style="text-align:center">Logs</h2>
-    <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
-  </div>
-
-  <!-- Guardian GX -->
-  <div class="card">
-    <h2 style="text-align:center; color:#1db954;">TAUROS V5  - Trade 2026</h2>
-
-   
-
-  <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
 
 <script>
 // LOG
@@ -227,7 +224,6 @@ async function sha256Hex(text){
 
 // Cálculos com base no modelo 6G Tauros V5 (Peso Dinâmico)
 function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
-  // Peso dinâmico
   let peso = Math.exp(-ADR * VArh) * Math.pow(1 + VArh, -1) * r * Math.exp(-a * u) / ((1 + b * u) * (1 + k * A(t)));
   return peso;
 }
@@ -245,13 +241,11 @@ function calcularPesoNormalizado(pesosDinamicos) {
 
 // Função para calcular o valor de mint com base no modelo
 async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
-  // Calcular peso dinâmico e normalizado
   let pesoDinamico = calcularPesoDinamico(ADR, VArh, r, b, k, u);
   let pesoNormalizado = calcularPesoNormalizado([pesoDinamico]);
 
-  // Ajustar o valor do mint de acordo com o peso
-  const valorAjustado = amount * pesoNormalizado[0]; // Ajustando valor com peso normalizado
-  const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Converting to Wei for minting
+  const valorAjustado = amount * pesoNormalizado[0];
+  const amountWei = BigInt(Math.floor(valorAjustado * 1e15));
 
   log("Valor ajustado: " + valorAjustado);
   log("Mint com valor ajustado: " + amountWei);
@@ -271,14 +265,13 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
   if(isNaN(amount)){alert("Valor inválido."); return;}
 
-  const ADR = 0.5; // exemplo de valor ADR
-  const VArh = 0.7; // exemplo de valor VArh
-  const r = 0.1;    // exemplo de valor r
-  const b = 0.02;   // exemplo de valor b
-  const k = 0.03;   // exemplo de valor k
-  const u = 0.5;    // exemplo de valor u (ajuste)
+  const ADR = 0.5;
+  const VArh = 0.7;
+  const r = 0.1;
+  const b = 0.02;
+  const k = 0.03;
+  const u = 0.5;
 
-  // Calcular o valor ajustado com o novo modelo
   const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
 
   const brcode = `000201...valor${amount}...chave${key}...note${note}`;
