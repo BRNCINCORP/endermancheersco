@@ -181,31 +181,25 @@
     .ticker-item .positive { color: #4caf50; font-weight: bold; }
     .ticker-item .negative { color: #f44336; font-weight: bold; }
 
+    .ticker-item .triangle-up {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 10px solid #4caf50; /* Triângulo verde */
+    }
+
+    .ticker-item .triangle-down {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 10px solid #f44336; /* Triângulo vermelho */
+    }
+
     @keyframes scrollTicker {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
-    }
-
-    /* Estilos do input box de ativo */
-    .input-box {
-      margin-bottom: 20px;
-    }
-
-    .input-box label {
-      font-size: 1rem;
-      margin-bottom: 5px;
-      display: block;
-      color: #fff;
-    }
-
-    .input-box select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      background-color: #333;
-      color: #fff;
-      font-size: 1rem;
-      border: 1px solid #444;
     }
   </style>
 </head>
@@ -240,9 +234,69 @@
     <!-- Ticker horizontal -->
     <div class="card">
       <div class="ticker-horizontal">
-        <div class="ticker-track" id="tickerTrack">
-          <!-- Os dados do ticker serão gerados via JS -->
-        </div>
+   <script>
+// Função para buscar o valor do Dólar em tempo real
+async function fetchDollarPrice() {
+  try {
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const data = await response.json();
+    const brlPrice = data.rates.BRL;  // Obtém a cotação do USD/BRL
+    return brlPrice;
+  } catch (error) {
+    console.error("Erro ao buscar o valor do dólar:", error);
+    return null;
+  }
+}
+
+// Ticker de preços
+async function updateTicker() {
+  const dollarPrice = await fetchDollarPrice();
+  const tickerTrack = document.getElementById('tickerTrack');
+
+  if (!dollarPrice) {
+    tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
+    return;
+  }
+
+  // Exemplo de dados fictícios para outras moedas, mas com a cotação do Dólar
+  const tickerData = [
+    { symbol: 'USD/BRL', price: dollarPrice, change: 0.3, isPositive: true }, // Aqui está a cotação USD/BRL
+    // Você pode adicionar outros dados, como Bitcoin, Ethereum, etc.
+  ];
+
+  tickerTrack.innerHTML = ''; // Limpa o ticker antes de adicionar novos itens
+
+  tickerData.forEach(item => {
+    const tickerElement = document.createElement('div');
+    tickerElement.classList.add('ticker-item');
+
+    const symbol = document.createElement('span');
+    symbol.textContent = `${item.symbol}:`;
+
+    const price = document.createElement('span');
+    price.classList.add(item.isPositive ? 'positive' : 'negative');
+    price.textContent = `R$ ${item.price.toFixed(2)}`; // Exibindo o preço com R$ para real
+
+    const change = document.createElement('span');
+    change.textContent = `${item.isPositive ? '↑' : '↓'} ${item.change.toFixed(1)}%`;
+
+    const triangle = document.createElement('div');
+    triangle.classList.add(item.isPositive ? 'triangle-up' : 'triangle-down');
+
+    tickerElement.appendChild(symbol);
+    tickerElement.appendChild(price);
+    tickerElement.appendChild(change);
+    tickerElement.appendChild(triangle);
+
+    tickerTrack.appendChild(tickerElement);
+  });
+}
+
+// Atualizar o ticker a cada 10 segundos
+setInterval(updateTicker, 10000);
+updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
+</script>
+
       </div>
     </div>
 
@@ -265,126 +319,56 @@
   </div>
 
 <script>
-// LOG
-function log(msg) {
-  const l = document.getElementById("log");
-  l.textContent += "\n" + msg;
-  l.scrollTop = l.scrollHeight;
-  console.log(msg);
+// Função para buscar o valor do Dólar em tempo real
+async function fetchDollarPrice() {
+  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+  const data = await response.json();
+  const brlPrice = data.rates.BRL;
+  return brlPrice;
 }
 
-// ETHERS
-let provider = null, signer = null, contract = null;
-const ABI = ["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
+// Ticker de preços
+async function updateTicker() {
+  const dollarPrice = await fetchDollarPrice();
+  const tickerTrack = document.getElementById('tickerTrack');
 
-// Auto-connect se MetaMask já estiver ativa
-async function autoConnect() {
-  if (window.ethereum) {
-    provider = new ethers.BrowserProvider(window.ethereum);
-    const accounts = await provider.send("eth_accounts", []);
-    if (accounts.length > 0) {
-      signer = await provider.getSigner();
-      document.getElementById("walletAddr").textContent = "Conectado: " + await signer.getAddress();
-      log("Carteira conectada automaticamente.");
-    }
-  }
-}
-autoConnect();
+  // Exemplo de dados fictícios para Bitcoin e Dólar
+  const tickerData = [
+    { symbol: 'BTC/USD', price: 23400, change: 2.5, isPositive: true },
+    { symbol: 'USD/BRL', price: dollarPrice, change: -0.3, isPositive: false },
+  ];
 
-// Conectar Carteira
-document.getElementById("connectBtn").onclick = async () => {
-  if (window.ethereum) {
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      provider = new ethers.BrowserProvider(window.ethereum);
-      signer = await provider.getSigner();
-      document.getElementById("walletAddr").textContent = "Conectado: " + await signer.getAddress();
-      log("Carteira conectada com sucesso.");
-    } catch (error) {
-      log("Erro ao conectar carteira: " + error.message);
-    }
-  }
-};
+  tickerTrack.innerHTML = '';
 
-// SHA256
-async function sha256Hex(text) {
-  const enc = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest("SHA-256", enc);
-  return "0x" + Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
-}
+  tickerData.forEach(item => {
+    const tickerElement = document.createElement('div');
+    tickerElement.classList.add('ticker-item');
 
-// Função para calcular o peso dinâmico baseado no DRAPP
-async function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
-  let pesoDinamico = ADR * Math.exp(-ADR * r) * (1 + VArh) / (1 + Math.exp(k * u));
-  return pesoDinamico;
+    const symbol = document.createElement('span');
+    symbol.textContent = `${item.symbol}:`;
+
+    const price = document.createElement('span');
+    price.classList.add(item.isPositive ? 'positive' : 'negative');
+    price.textContent = `$${item.price.toFixed(2)}`;
+
+    const change = document.createElement('span');
+    change.textContent = `${item.isPositive ? '↑' : '↓'} ${item.change.toFixed(1)}%`;
+
+    const triangle = document.createElement('div');
+    triangle.classList.add(item.isPositive ? 'triangle-up' : 'triangle-down');
+
+    tickerElement.appendChild(symbol);
+    tickerElement.appendChild(price);
+    tickerElement.appendChild(change);
+    tickerElement.appendChild(triangle);
+
+    tickerTrack.appendChild(tickerElement);
+  });
 }
 
-// Função para normalizar o peso
-async function calcularPesoNormalizado(pesos) {
-  const somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
-  return pesos.map(peso => peso / somaPesos);
-}
-
-// Função para calcular o valor de mint com base no modelo DRAPP
-async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
-  let pesoDinamico = await calcularPesoDinamico(ADR, VArh, r, b, k, u);
-  let pesoNormalizado = await calcularPesoNormalizado([pesoDinamico]);
-
-  const valorAjustado = amount * pesoNormalizado[0];
-  const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Convertendo para wei
-
-  log("Valor ajustado: " + valorAjustado);
-  log("Mint com valor ajustado: " + amountWei);
-
-  return amountWei;
-}
-
-// Botão PIX + Mint acionando engine
-document.getElementById("pixQRBtn").addEventListener("click", async () => {
-  if (!signer || !contract) {
-    log("Conecte carteira e contrato antes.");
-    return;
-  }
-
-  // Preencha com o contrato e inicialize o motor
-  await DAQEngine.init(signer, contract);
-
-  const amount = document.getElementById("pixValue").value.trim();
-  const key = document.getElementById("pixUserKey").value.trim();
-  const note = document.getElementById("userNote").value.trim();
-
-  if (!amount || !key) {
-    alert("Preencha valor e chave PIX.");
-    return;
-  }
-  if (isNaN(amount)) {
-    alert("Valor inválido.");
-    return;
-  }
-
-  // Parâmetros DRAPP
-  const ADR = 0.5;
-  const VArh = 0.7;
-  const r = 0.1;
-  const b = 0.02;
-  const k = 0.03;
-  const u = 0.5;
-
-  // Calculando o valor ajustado com base nos parâmetros DRAPP
-  const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
-
-  // Gerando QRCode PIX
-  const brcode = `000201...valor${amount}...chave${key}...note${note}`;
-  const img = document.createElement("img");
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=225x225&data=" + encodeURIComponent(brcode);
-  const container = document.getElementById("pixQRContainer");
-  container.innerHTML = "";
-  container.appendChild(img);
-  log("QRCode PIX gerado.");
-
-  // Monitorando o mint
-  await DAQEngine.mintMonitor(amountWei, key, note);
-});
+// Atualizar o ticker a cada 10 segundos
+setInterval(updateTicker, 10000);
+updateTicker();
 </script>
 
 </body>
