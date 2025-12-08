@@ -111,19 +111,6 @@
       height: auto;
     }
 
-    /* Logs - área de exibição de logs */
-    #log {
-      background-color: #1c1c1c;
-      color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      margin-top: 10px;
-    }
-
     /* Footer */
     .footer {
       width: 100%;
@@ -133,7 +120,7 @@
       left: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       padding: 0 20px;
       background: linear-gradient(90deg, #ff0040, #ffcc00);
       color: #000;
@@ -147,96 +134,16 @@
       border-top: 2px solid #ff003c;
       backdrop-filter: blur(12px);
     }
-
-    /* Ticker horizontal */
-    .ticker-horizontal {
-      width: 100%;
-      overflow: hidden;
-      background: #1a1a1a;
-      border-radius: 8px;
-      padding: 10px 0;
-      margin-bottom: 14px;
-    }
-
-    .ticker-track {
-      display: flex;
-      gap: 40px;
-      white-space: nowrap;
-      animation: scrollTicker 20s linear infinite;
-    }
-
-    .ticker-item {
-      display: flex;
-      gap: 8px;
-      font-size: 1rem;
-      color: #fff;
-      align-items: center;
-    }
-
-    .ticker-item .positive { color: #4caf50; font-weight: bold; }
-    .ticker-item .negative { color: #f44336; font-weight: bold; }
-
-    .ticker-item .triangle-up {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 10px solid #4caf50; /* Triângulo verde */
-    }
-
-    .ticker-item .triangle-down {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 10px solid #f44336; /* Triângulo vermelho */
-    }
-
-    @keyframes scrollTicker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
   </style>
 </head>
 <body>
   <div class="iphone-container">
     <h1>ENDERMAN CHEERS WALLET</h1>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
-
-<!-- Conectar Carteira -->
-<div class="card">
-  <button id="connectBtn">meta mask /button>
-  <div id="walletAddr" class="small">Status: desconectado</div>
-</div>
-
-
-
-    <!-- Seleção de Ativos -->
+    <!-- Conectar Carteira -->
     <div class="card">
-      <div class="input-box">
-        <label for="assetSelect">Selecione seu ativo:</label>
-        <select id="assetSelect">
-          <option value="">Selecione um ativo</option>
-          <option value="nix_ore" data-nix="10" data-label="NIX-ALOT Ore">NIX-ALOT Ore</option>
-          <option value="nix_craft" data-nix="50" data-label="NIX-ALOT Craft">NIX-ALOT Craft</option>
-          <option value="nix_redstone" data-nix="100" data-label="NIX-ALOT Redstone">NIX-ALOT Redstone</option>
-          <option value="nix_diamond" data-nix="200" data-label="NIX-ALOT Diamond">NIX-ALOT Diamond</option>
-          <option value="nix_gold" data-nix="150" data-label="NIX-ALOT Gold">NIX-ALOT Gold</option>
-          <option value="nix_emerald" data-nix="300" data-label="NIX-ALOT Emerald">NIX-ALOT Emerald</option>
-          <option value="nix_lapis" data-nix="80" data-label="NIX-ALOT Lapis">NIX-ALOT Lapis</option>
-          <option value="nix_netherite" data-nix="500" data-label="NIX-ALOT Netherite">NIX-ALOT Netherite</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Ticker horizontal -->
-    <div class="card">
-      <div class="ticker-horizontal">
-        <div id="tickerTrack" class="ticker-track">
-          <!-- O ticker será preenchido aqui pelo script -->
-        </div>
-      </div>
+      <button id="connectBtn">Conectar MetaMask</button>
+      <div id="walletAddr" class="small">Status: desconectado</div>
     </div>
 
     <!-- PIX + Mint -->
@@ -256,131 +163,64 @@
 
     <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
 
-<!-- Conectar Carteira -->
-<div class="card">
-  <button id="connectBtn"></button>
-  <div id="walletAddr" class="small">Status: desconectado</div>
-</div>
+  <!-- Script de Conexão MetaMask e Geração de QR Code -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
+  <script>
+    // -------- Conexão MetaMask --------
+    const connectBtn = document.getElementById("connectBtn");
+    const walletAddrEl = document.getElementById("walletAddr");
 
-<!-- Ticker de Ativos -->
-<div id="tickerTrack"></div>
+    if (typeof window.ethereum === "undefined") {
+      connectBtn.disabled = true;
+    }
 
-<script>
-// -------- Conexão MetaMask --------
-const connectBtn = document.getElementById("connectBtn");
-const walletAddrEl = document.getElementById("walletAddr");
+    async function connectWallet() {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        const userAddress = accounts[0];
+        walletAddrEl.textContent = `Conectado: ${userAddress}`;
+        connectBtn.textContent = "Desconectar Carteira";
+      } catch (error) {
+        walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+        console.error(error);
+      }
+    }
 
-// Verificar se o MetaMask está instalado
-if (typeof window.ethereum === "undefined") {
-  connectBtn.disabled = true;
-  walletAddrEl.textContent = "MetaMask não detectado. ";
-}
-
-// Função para conectar a MetaMask
-async function connectWallet() {
-  try {
-    // Solicitar ao usuário que se conecte à MetaMask
-    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-
-    // Exibir o endereço da carteira conectada
-    const userAddress = accounts[0];
-    walletAddrEl.textContent = `Conectado: ${userAddress}`;
-
-    // Alterar o status do botão
-    connectBtn.textContent = "Desconectar Carteira";
-
-    // Listener para quando a conta ou rede mudar
-    window.ethereum.on("accountsChanged", (accounts) => {
-      walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
+    connectBtn.addEventListener("click", () => {
+      if (connectBtn.textContent === "Conectar MetaMask") {
+        connectWallet();
+      } else {
+        walletAddrEl.textContent = "Status: desconectado";
+        connectBtn.textContent = "Conectar MetaMask";
+      }
     });
 
-    window.ethereum.on("chainChanged", (chainId) => {
-      console.log("Rede mudada:", chainId);
-      // Você pode atualizar a rede ou fazer outras ações quando mudar a rede.
+    // -------- Geração de QR Code PIX --------
+    document.getElementById("pixQRBtn").addEventListener("click", function() {
+      const value = document.getElementById("pixValue").value;
+      const userKey = document.getElementById("pixUserKey").value;
+      const note = document.getElementById("userNote").value;
+
+      if (!value || !userKey) {
+        alert("Preencha todos os campos obrigatórios.");
+        return;
+      }
+
+      // Gerar o QR Code PIX com base nas informações fornecidas
+      const pixData = `00020126580014BR.GOV.BCB.PIX0114${userKey}5204000053039865404${(parseFloat(value) * 100).toFixed(0)}5802BR5913APOLO26X62900012${note}`;
+      
+      // Gerar e exibir o QR Code
+      QRCode.toDataURL(pixData, function(err, url) {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        const qrContainer = document.getElementById("pixQRContainer");
+        qrContainer.innerHTML = `<img src="${url}" alt="QR Code PIX"/>`;
+      });
     });
-
-  } catch (error) {
-    walletAddrEl.textContent = "Erro ao conectar à MetaMask";
-    console.error(error);
-  }
-}
-
-// Evento de clique no botão
-connectBtn.addEventListener("click", () => {
-  if (connectBtn.textContent === "Conectar Carteira") {
-    connectWallet();
-  } else {
-    walletAddrEl.textContent = "Status: desconectado";
-    connectBtn.textContent = "Conectar Carteira";
-  }
-});
-
-// -------- Funções do Ticker --------
-
-// Função para buscar o valor do Dólar em tempo real
-async function fetchDollarPrice() {
-  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-  const data = await response.json();
-  return data.rates.BRL;
-}
-
-// Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
-async function updateTicker() {
-  const dollarPrice = await fetchDollarPrice();
-  const tickerTrack = document.getElementById('tickerTrack');
-
-  if (!dollarPrice) {
-    tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
-    return;
-  }
-
-  // Supondo que você tenha uma lista de ativos
-  const assets = {
-    "NIX-ALOT Ore": 2,
-    "NIX-ALOT Craft": 5,
-    "NIX-ALOT Redstone": 10,
-    "NIX-ALOT Diamond": 20,
-    "NIX-ALOT Gold": 15,
-    "NIX-ALOT Emerald": 30,
-    "NIX-ALOT Lapis": 8,
-    "NIX-ALOT Netherite": 50
-  };
-
-  for (const [label, assetValue] of Object.entries(assets)) {
-    const priceInBRL = (assetValue * dollarPrice).toFixed(2);
-
-    const tickerElement = document.createElement('div');
-    tickerElement.classList.add('ticker-item');
-
-    const symbol = document.createElement('span');
-    symbol.textContent = `${label}:`;
-
-    const price = document.createElement('span');
-    price.classList.add('positive');
-    price.textContent = `R$ ${priceInBRL}`;
-
-    const change = document.createElement('span');
-    change.textContent = '↑ 0.3%';  // Pode ser ajustado para mostrar variações reais
-
-    const triangle = document.createElement('div');
-    triangle.classList.add('triangle-up');
-
-    tickerElement.appendChild(symbol);
-    tickerElement.appendChild(price);
-    tickerElement.appendChild(change);
-    tickerElement.appendChild(triangle);
-
-    tickerTrack.appendChild(tickerElement);
-  }
-}
-
-// Atualizar o ticker a cada 10 segundos
-setInterval(updateTicker, 10000);
-updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
-
-</script>
-
+  </script>
 </body>
 </html>
