@@ -193,7 +193,6 @@
       <button id="connectBtn">Conectar MetaMask</button>
     </div>
 
-
     <!-- Seleção de Ativos -->
     <div class="card">
       <div class="input-box">
@@ -211,6 +210,7 @@
         </select>
       </div>
     </div>
+
     <!-- Ticker horizontal -->
     <div class="card">
       <div class="ticker-horizontal">
@@ -219,6 +219,7 @@
         </div>
       </div>
     </div>
+
     <!-- PIX + Mint -->
     <div class="card">
       <h2 style="text-align:center">PRESS F11</h2>
@@ -240,181 +241,105 @@
   <!-- Script de Conexão MetaMask e Geração de QR Code -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
-<script>
-// -------- Conexão MetaMask --------
-const connectBtn = document.getElementById("connectBtn");
-const walletAddrEl = document.getElementById("walletAddr");
 
-// Verificar se o MetaMask está instalado
-if (typeof window.ethereum === "undefined") {
-  connectBtn.disabled = true;
-  walletAddrEl.textContent = "MetaMask não detectado.";
-}
+  <script>
+    // -------- Conexão MetaMask --------
+    const connectBtn = document.getElementById("connectBtn");
+    const walletAddrEl = document.getElementById("walletAddr");
 
-// Função para conectar a MetaMask
-async function connectWallet() {
-  try {
-    // Solicitar ao usuário que se conecte à MetaMask
-    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    if (typeof window.ethereum === "undefined") {
+      connectBtn.disabled = true;
+      walletAddrEl.textContent = "MetaMask não detectado.";
+    }
 
-    // Exibir o endereço da carteira conectada
-    const userAddress = accounts[0];
-    walletAddrEl.textContent = `Conectado: ${userAddress}`;
+    async function connectWallet() {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        const userAddress = accounts[0];
+        walletAddrEl.textContent = `Conectado: ${userAddress}`;
+        connectBtn.textContent = "Desconectar Carteira";
+        window.ethereum.on("accountsChanged", (accounts) => {
+          walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
+        });
+        window.ethereum.on("chainChanged", (chainId) => {
+          console.log("Rede mudada:", chainId);
+        });
+      } catch (error) {
+        walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+        console.error(error);
+      }
+    }
 
-    // Alterar o status do botão
-    connectBtn.textContent = "Desconectar Carteira";
-
-    // Listener para quando a conta ou rede mudar
-    window.ethereum.on("accountsChanged", (accounts) => {
-      walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
+    connectBtn.addEventListener("click", () => {
+      if (connectBtn.textContent === "Conectar Carteira") {
+        connectWallet();
+      } else {
+        walletAddrEl.textContent = "Status: desconectado";
+        connectBtn.textContent = "Conectar Carteira";
+      }
     });
 
-    window.ethereum.on("chainChanged", (chainId) => {
-      console.log("Rede mudada:", chainId);
-      // Você pode atualizar a rede ou fazer outras ações quando mudar a rede.
-    });
+    // -------- Funções do Ticker --------
 
-  } catch (error) {
-    walletAddrEl.textContent = "Erro ao conectar à MetaMask";
-    console.error(error);
-  }
-}
+    async function fetchDollarPrice() {
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const data = await response.json();
+      return data.rates.BRL;
+    }
 
-// Evento de clique no botão
-connectBtn.addEventListener("click", () => {
-  if (connectBtn.textContent === "Conectar Carteira") {
-    connectWallet();
-  } else {
-    walletAddrEl.textContent = "Status: desconectado";
-    connectBtn.textContent = "Conectar Carteira";
-  }
-});
+    const assets = {
+      "NIX-ALOT Ore": 2,
+      "NIX-ALOT Craft": 5,
+      "NIX-ALOT Redstone": 10,
+      "NIX-ALOT Diamond": 20,
+      "NIX-ALOT Gold": 15,
+      "NIX-ALOT Emerald": 30,
+      "NIX-ALOT Lapis": 8,
+      "NIX-ALOT Netherite": 50
+    };
 
-// -------- Funções do Ticker --------
+    async function updateTicker() {
+      const dollarPrice = await fetchDollarPrice();
+      const tickerTrack = document.getElementById('tickerTrack');
 
-// Função para buscar o valor do Dólar em tempo real
-async function fetchDollarPrice() {
-  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-  const data = await response.json();
-  return data.rates.BRL;
-}
+      if (!dollarPrice) {
+        tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
+        return;
+      }
 
-// Exemplo de ativos com seus valores em USD
-const assets = {
-  "Bitcoin": 30000,  // Exemplo de valor do Bitcoin em USD
-  "Ethereum": 1800,  // Exemplo de valor do Ethereum em USD
-  "Litecoin": 100    // Exemplo de valor do Litecoin em USD
-};
+      tickerTrack.innerHTML = ""; // Limpar ticker
 
-// Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
-async function updateTicker() {
-  const dollarPrice = await fetchDollarPrice();
-  const tickerTrack = document.getElementById('tickerTrack');
+      for (const [label, assetValue] of Object.entries(assets)) {
+        const priceInBRL = (assetValue * dollarPrice).toFixed(2);
 
-  if (!dollarPrice) {
-    tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
-    return;
-  }
+        const tickerElement = document.createElement('div');
+        tickerElement.classList.add('ticker-item');
 
-  // Limpar os elementos existentes no ticker
-  tickerTrack.innerHTML = "";
+        const symbol = document.createElement('span');
+        symbol.textContent = `${label}:`;
 
-  // Atualizar o ticker com os valores dos ativos
-  for (const [label, assetValue] of Object.entries(assets)) {
-    const priceInBRL = (assetValue * dollarPrice).toFixed(2);
+        const price = document.createElement('span');
+        price.classList.add('positive');
+        price.textContent = `R$ ${priceInBRL}`;
 
-    const tickerElement = document.createElement('div');
-    tickerElement.classList.add('ticker-item');
+        const change = document.createElement('span');
+        change.textContent = '↑ 0.3%';
 
-    const symbol = document.createElement('span');
-    symbol.textContent = `${label}:`;
+        const triangle = document.createElement('div');
+        triangle.classList.add('triangle-up');
 
-    const price = document.createElement('span');
-    price.classList.add('positive');
-    price.textContent = `R$ ${priceInBRL}`;
+        tickerElement.appendChild(symbol);
+        tickerElement.appendChild(price);
+        tickerElement.appendChild(change);
+        tickerElement.appendChild(triangle);
 
-    const change = document.createElement('span');
-    change.textContent = '↑ 0.3%';  // Pode ser ajustado para mostrar variações reais
+        tickerTrack.appendChild(tickerElement);
+      }
+    }
 
-    const triangle = document.createElement('div');
-    triangle.classList.add('triangle-up');
-
-    tickerElement.appendChild(symbol);
-    tickerElement.appendChild(price);
-    tickerElement.appendChild(change);
-    tickerElement.appendChild(triangle);
-
-    tickerTrack.appendChild(tickerElement);
-  }
-// -------- Funções do Ticker --------
-
-// Função para buscar o valor do Dólar em tempo real
-async function fetchDollarPrice() {
-  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-  const data = await response.json();
-  return data.rates.BRL;
-}
-
-// Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
-async function updateTicker() {
-  const dollarPrice = await fetchDollarPrice();
-  const tickerTrack = document.getElementById('tickerTrack');
-
-  if (!dollarPrice) {
-    tickerTrack.innerHTML = "Erro ao carregar os dados do dólar";
-    return;
-  }
-
-  // Supondo que você tenha uma lista de ativos
-  const assets = {
-    "NIX-ALOT Ore": 2,
-    "NIX-ALOT Craft": 5,
-    "NIX-ALOT Redstone": 10,
-    "NIX-ALOT Diamond": 20,
-    "NIX-ALOT Gold": 15,
-    "NIX-ALOT Emerald": 30,
-    "NIX-ALOT Lapis": 8,
-    "NIX-ALOT Netherite": 50
-  };
-
-  for (const [label, assetValue] of Object.entries(assets)) {
-    const priceInBRL = (assetValue * dollarPrice).toFixed(2);
-
-    const tickerElement = document.createElement('div');
-    tickerElement.classList.add('ticker-item');
-
-    const symbol = document.createElement('span');
-    symbol.textContent = `${label}:`;
-
-    const price = document.createElement('span');
-    price.classList.add('positive');
-    price.textContent = `R$ ${priceInBRL}`;
-
-    const change = document.createElement('span');
-    change.textContent = '↑ 0.3%';  // Pode ser ajustado para mostrar variações reais
-
-    const triangle = document.createElement('div');
-    triangle.classList.add('triangle-up');
-
-    tickerElement.appendChild(symbol);
-    tickerElement.appendChild(price);
-    tickerElement.appendChild(change);
-    tickerElement.appendChild(triangle);
-
-    tickerTrack.appendChild(tickerElement);
-  }
-}
-
-// Atualizar o ticker a cada 10 segundos
-setInterval(updateTicker, 10000);
-updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
-
-
-// Atualizar o ticker a cada 10 segundos
-setInterval(updateTicker, 10000);
-updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
-
-</script>
+    setInterval(updateTicker, 10000);
+    updateTicker();  // Chama para atualização imediata
+  </script>
 
 </body>
 </html>
