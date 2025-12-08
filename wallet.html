@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<link rel="icon" href="logo.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Enderman Cheers Wallet</title>
+
+<style>
+  /* Mantendo o estilo do layout */
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+  <h1>ENDERMAN CHEERS WALLET</h1>
+
+  <!-- Conectar Carteira -->
+  <div class="card">
+    <button id="connectBtn">Conectar Carteira</button>
+    <div id="walletAddr" class="small">Status: desconectado</div>
+  </div>
+
+  <!-- PIX + Mint -->
+  <div class="card">
+    <h2 style="text-align:center">JANUS26</h2>
+    <input id="pixValue" placeholder="Valor (BRL)"/>
+    <input id="pixUserKey" placeholder="Chave PIX"/>
+    <input id="userNote" placeholder="Observação (opcional)"/>
+    <button id="pixQRBtn">Gerar QR Code + Mint</button>
+    <div id="pixQRContainer"></div>
+  </div>
+
+  <!-- Logs -->
+  <div class="card">
+    <h2 style="text-align:center">Logs</h2>
+    <pre id="log">RUNNING HORIGAMI SUIT 1.0 ...</pre>
+  </div>
+
+  <!-- Guardian GX -->
+  <div class="card">
+    <h2 style="text-align:center; color:#1db954;">Guardian GX - Trade 2025</h2>
+
+    <label for="gxParam1">Parâmetro 1 (Performance mínima %):</label>
+    <input id="gxParam1" placeholder="Ex: 5"/>
+
+    <label for="gxParam2">Parâmetro 2 (Risco/ajuste %):</label>
+    <input id="gxParam2" placeholder="Ex: 2"/>
+
+    <label for="gxNumResults">Número de Resultados:</label>
+    <input type="number" id="gxNumResults" value="10" min="1" max="10"/>
+
+    <button id="gxRunBtn">Rodar Guardian GX</button>
+
+    <div class="results" id="gxResults"></div>
+  </div>
+
+  <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
+
+<script>
+// LOG
+function log(msg){
+  const l=document.getElementById("log");
+  l.textContent += "\n"+msg;
+  l.scrollTop=l.scrollHeight;
+  console.log(msg);
+}
+
+// ETHERS
+let provider=null, signer=null, contract=null;
+const ABI=["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
+
+// Auto-connect se MetaMask já estiver ativa
+async function autoConnect(){
+  if(window.ethereum){
+    provider=new ethers.BrowserProvider(window.ethereum);
+    const accounts=await provider.send("eth_accounts",[]);
+    if(accounts.length>0){
+      signer=await provider.getSigner();
+      document.getElementById("walletAddr").textContent="Conectado: "+await signer.getAddress();
+      log("Carteira conectada automaticamente.");
+    }
+  }
+}
+autoConnect();
+
+// Conectar Carteira
+document.getElementById("connectBtn").onclick=async()=>{ /* ... */ };
+
+// SHA256
+async function sha256Hex(text){
+  const enc=new TextEncoder().encode(text);
+  const hash=await crypto.subtle.digest("SHA-256",enc);
+  return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// Cálculos com base no modelo 6G Tauros V5 (Peso Dinâmico)
+function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
+  // Peso dinâmico
+  let peso = Math.exp(-ADR * VArh) * Math.pow(1 + VArh, -1) * r * Math.exp(-a * u) / ((1 + b * u) * (1 + k * A(t)));
+  return peso;
+}
+
+// Normalização dos Pesos
+function normalizarPeso(pesos) {
+  let somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
+  return pesos.map(peso => peso / somaPesos);
+}
+
+// Peso normalizado
+function calcularPesoNormalizado(pesosDinamicos) {
+  return normalizarPeso(pesosDinamicos);
+}
+
+// Função para calcular o valor de mint com base no modelo
+async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
+  // Calcular peso dinâmico e normalizado
+  let pesoDinamico = calcularPesoDinamico(ADR, VArh, r, b, k, u);
+  let pesoNormalizado = calcularPesoNormalizado([pesoDinamico]);
+
+  // Ajustar o valor do mint de acordo com o peso
+  const valorAjustado = amount * pesoNormalizado[0]; // Ajustando valor com peso normalizado
+  const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Converting to Wei for minting
+
+  log("Valor ajustado: " + valorAjustado);
+  log("Mint com valor ajustado: " + amountWei);
+
+  return amountWei;
+}
+
+// Botão PIX + Mint acionando engine
+document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
+  if(!signer || !contract){log("Conecte carteira e contrato antes."); return;}
+  await DAQEngine.init(signer, contract);
+
+  const amount = document.getElementById("pixValue").value.trim();
+  const key = document.getElementById("pixUserKey").value.trim();
+  const note = document.getElementById("userNote").value.trim();
+
+  if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
+  if(isNaN(amount)){alert("Valor inválido."); return;}
+
+  const ADR = 0.5; // exemplo de valor ADR
+  const VArh = 0.7; // exemplo de valor VArh
+  const r = 0.1;    // exemplo de valor r
+  const b = 0.02;   // exemplo de valor b
+  const k = 0.03;   // exemplo de valor k
+  const u = 0.5;    // exemplo de valor u (ajuste)
+
+  // Calcular o valor ajustado com o novo modelo
+  const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
+
+  const brcode = `000201...valor${amount}...chave${key}...note${note}`;
+  const img = document.createElement("img");
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=225x225&data=" + encodeURIComponent(brcode);
+  const container = document.getElementById("pixQRContainer");
+  container.innerHTML = ""; 
+  container.appendChild(img);
+  log("QRCode PIX gerado.");
+
+  await DAQEngine.mintMonitor(amountWei, key, note);
+});
+</script>
+</body>
+</html>
