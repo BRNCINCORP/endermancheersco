@@ -234,14 +234,37 @@
     <!-- Ticker horizontal -->
     <div class="card">
       <div class="ticker-horizontal">
-   <script>
+        <div id="tickerTrack" class="ticker-track">
+          <!-- O ticker será preenchido aqui pelo script -->
+        </div>
+      </div>
+    </div>
+
+    <!-- PIX + Mint -->
+    <div class="card">
+      <h2 style="text-align:center">APOLO26 PRESS F11</h2>
+      <input id="pixValue" placeholder="Valor (BRL)"/>
+      <input id="pixUserKey" placeholder="Chave PIX"/>
+      <input id="userNote" placeholder="Observação (opcional)"/>
+      <button id="pixQRBtn">Gerar QR Code + Mint</button>
+      <div id="pixQRContainer"></div>
+    </div>
+
+    <!-- Logs -->
+    <div class="card">
+      <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
+    </div>
+
+    <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
+  </div>
+
+<script>
 // Função para buscar o valor do Dólar em tempo real
 async function fetchDollarPrice() {
   try {
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
     const data = await response.json();
-    const brlPrice = data.rates.BRL;  // Obtém a cotação do USD/BRL
-    return brlPrice;
+    return data.rates.BRL;
   } catch (error) {
     console.error("Erro ao buscar o valor do dólar:", error);
     return null;
@@ -258,10 +281,8 @@ async function updateTicker() {
     return;
   }
 
-  // Exemplo de dados fictícios para outras moedas, mas com a cotação do Dólar
   const tickerData = [
-    { symbol: 'USD/BRL', price: dollarPrice, change: 0.3, isPositive: true }, // Aqui está a cotação USD/BRL
-    // Você pode adicionar outros dados, como Bitcoin, Ethereum, etc.
+    { symbol: 'USD/BRL', price: dollarPrice, change: 0.3, isPositive: true },
   ];
 
   tickerTrack.innerHTML = ''; // Limpa o ticker antes de adicionar novos itens
@@ -275,7 +296,7 @@ async function updateTicker() {
 
     const price = document.createElement('span');
     price.classList.add(item.isPositive ? 'positive' : 'negative');
-    price.textContent = `R$ ${item.price.toFixed(2)}`; // Exibindo o preço com R$ para real
+    price.textContent = `R$ ${item.price.toFixed(2)}`;
 
     const change = document.createElement('span');
     change.textContent = `${item.isPositive ? '↑' : '↓'} ${item.change.toFixed(1)}%`;
@@ -296,80 +317,5 @@ async function updateTicker() {
 setInterval(updateTicker, 10000);
 updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
 </script>
-
-      </div>
-    </div>
-
-    <!-- PIX + Mint -->
-    <div class="card">
-      <h2 style="text-align:center">APOLO26 PRESS F11 </h2>
-      <input id="pixValue" placeholder="Valor (BRL)"/>
-      <input id="pixUserKey" placeholder="Chave PIX"/>
-      <input id="userNote" placeholder="Observação (opcional)"/>
-      <button id="pixQRBtn">Gerar QR Code + Mint</button>
-      <div id="pixQRContainer"></div>
-    </div>
-
-    <!-- Logs -->
-    <div class="card">
-      <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
-    </div>
-
-    <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
-  </div>
-
-<script>
-// Função para buscar o valor do Dólar em tempo real
-async function fetchDollarPrice() {
-  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-  const data = await response.json();
-  const brlPrice = data.rates.BRL;
-  return brlPrice;
-}
-
-// Ticker de preços
-async function updateTicker() {
-  const dollarPrice = await fetchDollarPrice();
-  const tickerTrack = document.getElementById('tickerTrack');
-
-  // Exemplo de dados fictícios para Bitcoin e Dólar
-  const tickerData = [
-    { symbol: 'BTC/USD', price: 23400, change: 2.5, isPositive: true },
-    { symbol: 'USD/BRL', price: dollarPrice, change: -0.3, isPositive: false },
-  ];
-
-  tickerTrack.innerHTML = '';
-
-  tickerData.forEach(item => {
-    const tickerElement = document.createElement('div');
-    tickerElement.classList.add('ticker-item');
-
-    const symbol = document.createElement('span');
-    symbol.textContent = `${item.symbol}:`;
-
-    const price = document.createElement('span');
-    price.classList.add(item.isPositive ? 'positive' : 'negative');
-    price.textContent = `$${item.price.toFixed(2)}`;
-
-    const change = document.createElement('span');
-    change.textContent = `${item.isPositive ? '↑' : '↓'} ${item.change.toFixed(1)}%`;
-
-    const triangle = document.createElement('div');
-    triangle.classList.add(item.isPositive ? 'triangle-up' : 'triangle-down');
-
-    tickerElement.appendChild(symbol);
-    tickerElement.appendChild(price);
-    tickerElement.appendChild(change);
-    tickerElement.appendChild(triangle);
-
-    tickerTrack.appendChild(tickerElement);
-  });
-}
-
-// Atualizar o ticker a cada 10 segundos
-setInterval(updateTicker, 10000);
-updateTicker();
-</script>
-
 </body>
 </html>
