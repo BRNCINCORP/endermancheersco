@@ -143,12 +143,11 @@
     <!-- Conectar Carteira -->
     <div class="card">
       <button id="connectBtn">Conectar MetaMask</button>
-      <div id="walletAddr" class="small">Status: desconectado</div>
     </div>
 
     <!-- PIX + Mint -->
     <div class="card">
-      <h2 style="text-align:center">APOLO26 PRESS F11</h2>
+      <h2 style="text-align:center">PRESS F11</h2>
       <input id="pixValue" placeholder="Valor (BRL)"/>
       <input id="pixUserKey" placeholder="Chave PIX"/>
       <input id="userNote" placeholder="Observação (opcional)"/>
@@ -170,7 +169,6 @@
   <script>
     // -------- Conexão MetaMask --------
     const connectBtn = document.getElementById("connectBtn");
-    const walletAddrEl = document.getElementById("walletAddr");
 
     if (typeof window.ethereum === "undefined") {
       connectBtn.disabled = true;
@@ -180,10 +178,10 @@
       try {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         const userAddress = accounts[0];
-        walletAddrEl.textContent = `Conectado: ${userAddress}`;
+        alert(`Conectado: ${userAddress}`);
         connectBtn.textContent = "Desconectar Carteira";
       } catch (error) {
-        walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+        alert("Erro ao conectar à MetaMask");
         console.error(error);
       }
     }
@@ -192,7 +190,7 @@
       if (connectBtn.textContent === "Conectar MetaMask") {
         connectWallet();
       } else {
-        walletAddrEl.textContent = "Status: desconectado";
+        alert("Desconectado");
         connectBtn.textContent = "Conectar MetaMask";
       }
     });
