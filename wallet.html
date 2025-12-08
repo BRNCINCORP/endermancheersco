@@ -129,49 +129,83 @@
       margin-top: 10px;
     }
 
-    footer {
-      background: #f7d200; /* amarelo forte */
-      border-top: 3px solid #ff0000; /* vermelho neon */
-      padding: 45px 30px;
+    /* Footer */
+    .footer {
+      width: 100%;
+      height: 50px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
-      gap: 30px;
-      color: #000; /* texto preto */
+      padding: 0 20px;
+      background: linear-gradient(90deg, #ff0040, #ffcc00);
+      color: #000;
+      font-size: 14px;
       font-weight: bold;
-      box-shadow: 0 -4px 18px rgba(255, 0, 0, 0.65); /* brilho vermelho */
-      position: relative;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 6px #ff0040, 0 0 12px #ffcc00;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 -3px 15px rgba(255, 0, 0, 0.5);
+      border-top: 2px solid #ff003c;
+      backdrop-filter: blur(12px);
+    }
+
+    /* Ticker horizontal */
+    .ticker-horizontal {
+      width: 100%;
       overflow: hidden;
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 10px 0;
+      margin-bottom: 14px;
     }
 
-    /* Linha neon vermelha animada */
-    footer::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -20%;
-      width: 140%;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #ff0000, transparent);
-      animation: cyberline 3s linear infinite;
-      opacity: 1;
-      filter: drop-shadow(0 0 6px #ff0000);
+    .ticker-track {
+      display: flex;
+      gap: 40px;
+      white-space: nowrap;
+      animation: scrollTicker 20s linear infinite;
     }
 
-    @keyframes cyberline {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+    .ticker-item {
+      display: flex;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #fff;
+      align-items: center;
     }
 
-    footer .brand {
-      font-size: 26px;
-      font-weight: 900;
-      color: #000; /* preto */
-      text-shadow: 
-        0 0 8px #ff0000,
-        0 0 14px #ff2a2a,
-        0 0 20px #ff4d4d;
-      letter-spacing: 1.4px;
+    .ticker-item .positive { color: #4caf50; font-weight: bold; }
+    .ticker-item .negative { color: #f44336; font-weight: bold; }
+
+    @keyframes scrollTicker {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Estilos do input box de ativo */
+    .input-box {
+      margin-bottom: 20px;
+    }
+
+    .input-box label {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      display: block;
+      color: #fff;
+    }
+
+    .input-box select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #333;
+      color: #fff;
+      font-size: 1rem;
+      border: 1px solid #444;
     }
   </style>
 </head>
@@ -185,16 +219,22 @@
       <div id="walletAddr" class="small">Status: desconectado</div>
     </div>
 
-    <!-- Seleção de Ativos e Tickers -->
+    <!-- Seleção de Ativos -->
     <div class="card">
-      <label for="assetSelector">Escolha um ativo:</label>
-      <select id="assetSelector">
-        <option value="BTC">Bitcoin (BTC)</option>
-        <option value="ETH">Ethereum (ETH)</option>
-        <option value="BNB">Binance Coin (BNB)</option>
-        <option value="ADA">Cardano (ADA)</option>
-        <option value="SOL">Solana (SOL)</option>
-      </select>
+      <div class="input-box">
+        <label for="assetSelect">Selecione seu ativo:</label>
+        <select id="assetSelect">
+          <option value="">Selecione um ativo</option>
+          <option value="nix_ore" data-nix="10" data-label="NIX-ALOT Ore">NIX-ALOT Ore</option>
+          <option value="nix_craft" data-nix="50" data-label="NIX-ALOT Craft">NIX-ALOT Craft</option>
+          <option value="nix_redstone" data-nix="100" data-label="NIX-ALOT Redstone">NIX-ALOT Redstone</option>
+          <option value="nix_diamond" data-nix="200" data-label="NIX-ALOT Diamond">NIX-ALOT Diamond</option>
+          <option value="nix_gold" data-nix="150" data-label="NIX-ALOT Gold">NIX-ALOT Gold</option>
+          <option value="nix_emerald" data-nix="300" data-label="NIX-ALOT Emerald">NIX-ALOT Emerald</option>
+          <option value="nix_lapis" data-nix="80" data-label="NIX-ALOT Lapis">NIX-ALOT Lapis</option>
+          <option value="nix_netherite" data-nix="500" data-label="NIX-ALOT Netherite">NIX-ALOT Netherite</option>
+        </select>
+      </div>
     </div>
 
     <!-- PIX + Mint -->
@@ -211,9 +251,9 @@
     <div class="card">
       <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
     </div>
-    <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
-  </div>
 
+    <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
+  </div>
 <script>
 // LOG
 function log(msg){
@@ -313,6 +353,5 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   await DAQEngine.mintMonitor(amountWei, key, note);
 });
 </script>
-
 </body>
 </html>
