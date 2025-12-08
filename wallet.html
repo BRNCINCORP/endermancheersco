@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <link rel="icon" href="logo.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <title>Enderman Cheers Wallet</title>
   <style>
     /* Estilos globais */
@@ -17,24 +17,25 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      overflow: hidden;
       box-sizing: border-box;
+      overflow: hidden;
     }
 
     /* Container que simula a tela do iPhone 15, responsivo */
     .iphone-container {
-      width: 90vw; /* Usa 90% da largura da tela */
-      max-width: 400px; /* Limita a largura máxima */
-      height: 90vh; /* Usa 90% da altura da tela */
-      max-height: 800px; /* Limita a altura máxima */
+      width: 100%;
+      max-width: 400px;
+      height: 100%;
+      max-height: 800px;
       background-color: #1c1c1c;
       border-radius: 20px; /* Borda arredondada */
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Sombra para dar efeito realista */
       padding: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       box-sizing: border-box;
+      overflow-y: auto;
     }
 
     /* Título da página */
@@ -207,35 +208,6 @@
       font-size: 1rem;
       border: 1px solid #444;
     }
-    .ticker-item .positive { color: #4caf50; font-weight: bold; }
-    .ticker-item .negative { color: #f44336; font-weight: bold; }
-
-    @keyframes scrollTicker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Estilos do input box de ativo */
-    .input-box {
-      margin-bottom: 20px;
-    }
-
-    .input-box label {
-      font-size: 1rem;
-      margin-bottom: 5px;
-      display: block;
-      color: #fff;
-    }
-
-    .input-box select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      background-color: #333;
-      color: #fff;
-      font-size: 1rem;
-      border: 1px solid #444;
-    }
   </style>
 </head>
 <body>
@@ -292,104 +264,102 @@
 
     <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
   </div>
-<script>
-// LOG
-function log(msg){
-  const l=document.getElementById("log");
-  l.textContent += "\n"+msg;
-  l.scrollTop=l.scrollHeight;
-  console.log(msg);
-}
 
-// ETHERS
-let provider=null, signer=null, contract=null;
-const ABI=["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
-
-// Auto-connect se MetaMask já estiver ativa
-async function autoConnect(){
-  if(window.ethereum){
-    provider=new ethers.BrowserProvider(window.ethereum);
-    const accounts=await provider.send("eth_accounts",[]);
-    if(accounts.length>0){
-      signer=await provider.getSigner();
-      document.getElementById("walletAddr").textContent="Conectado: "+await signer.getAddress();
-      log("Carteira conectada automaticamente.");
+  <script>
+    // LOG
+    function log(msg){
+      const l=document.getElementById("log");
+      l.textContent += "\n"+msg;
+      l.scrollTop=l.scrollHeight;
+      console.log(msg);
     }
-  }
-}
-autoConnect();
 
-// Conectar Carteira
-document.getElementById("connectBtn").onclick=async()=>{ /* ... */ };
+    // ETHERS
+    let provider=null, signer=null, contract=null;
+    const ABI=["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
 
-// SHA256
-async function sha256Hex(text){
-  const enc=new TextEncoder().encode(text);
-  const hash=await crypto.subtle.digest("SHA-256",enc);
-  return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
+    // Auto-connect se MetaMask já estiver ativa
+    async function autoConnect(){
+      if(window.ethereum){
+        provider=new ethers.BrowserProvider(window.ethereum);
+        const accounts=await provider.send("eth_accounts",[]);
+        if(accounts.length>0){
+          signer=await provider.getSigner();
+          document.getElementById("walletAddr").textContent="Conectado: "+await signer.getAddress();
+          log("Carteira conectada automaticamente.");
+        }
+      }
+    }
+    autoConnect();
 
-// Função para calcular o peso dinâmico baseado no DRAPP
-async function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
-  let pesoDinamico = ADR * Math.exp(-ADR * r) * (1 + VArh) / (1 + Math.exp(k * u));
-  return pesoDinamico;
-}
+    // SHA256
+    async function sha256Hex(text){
+      const enc=new TextEncoder().encode(text);
+      const hash=await crypto.subtle.digest("SHA-256",enc);
+      return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
 
-// Função para normalizar o peso
-async function calcularPesoNormalizado(pesos) {
-  const somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
-  return pesos.map(peso => peso / somaPesos);
-}
+    // Função para calcular o peso dinâmico baseado no DRAPP
+    async function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
+      let pesoDinamico = ADR * Math.exp(-ADR * r) * (1 + VArh) / (1 + Math.exp(k * u));
+      return pesoDinamico;
+    }
 
-// Função para calcular o valor de mint com base no modelo DRAPP
-async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
-  let pesoDinamico = await calcularPesoDinamico(ADR, VArh, r, b, k, u);
-  let pesoNormalizado = await calcularPesoNormalizado([pesoDinamico]);
+    // Função para normalizar o peso
+    async function calcularPesoNormalizado(pesos) {
+      const somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
+      return pesos.map(peso => peso / somaPesos);
+    }
 
-  const valorAjustado = amount * pesoNormalizado[0];
-  const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Convertendo para wei
+    // Função para calcular o valor de mint com base no modelo DRAPP
+    async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
+      let pesoDinamico = await calcularPesoDinamico(ADR, VArh, r, b, k, u);
+      let pesoNormalizado = await calcularPesoNormalizado([pesoDinamico]);
 
-  log("Valor ajustado: " + valorAjustado);
-  log("Mint com valor ajustado: " + amountWei);
+      const valorAjustado = amount * pesoNormalizado[0];
+      const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Convertendo para wei
 
-  return amountWei;
-}
+      log("Valor ajustado: " + valorAjustado);
+      log("Mint com valor ajustado: " + amountWei);
 
-// Botão PIX + Mint acionando engine
-document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
-  if(!signer || !contract){log("Conecte carteira e contrato antes."); return;}
-  await DAQEngine.init(signer, contract);
+      return amountWei;
+    }
 
-  const amount = document.getElementById("pixValue").value.trim();
-  const key = document.getElementById("pixUserKey").value.trim();
-  const note = document.getElementById("userNote").value.trim();
+    // Botão PIX + Mint acionando engine
+    document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
+      if(!signer || !contract){log("Conecte carteira e contrato antes."); return;}
+      await DAQEngine.init(signer, contract);
 
-  if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
-  if(isNaN(amount)){alert("Valor inválido."); return;}
+      const amount = document.getElementById("pixValue").value.trim();
+      const key = document.getElementById("pixUserKey").value.trim();
+      const note = document.getElementById("userNote").value.trim();
 
-  // Parâmetros DRAPP
-  const ADR = 0.5;
-  const VArh = 0.7;
-  const r = 0.1;
-  const b = 0.02;
-  const k = 0.03;
-  const u = 0.5;
+      if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
+      if(isNaN(amount)){alert("Valor inválido."); return;}
 
-  // Calculando o valor ajustado com base nos parâmetros DRAPP
-  const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
+      // Parâmetros DRAPP
+      const ADR = 0.5;
+      const VArh = 0.7;
+      const r = 0.1;
+      const b = 0.02;
+      const k = 0.03;
+      const u = 0.5;
 
-  // Gerando QRCode PIX
-  const brcode = `000201...valor${amount}...chave${key}...note${note}`;
-  const img = document.createElement("img");
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=225x225&data=" + encodeURIComponent(brcode);
-  const container = document.getElementById("pixQRContainer");
-  container.innerHTML = ""; 
-  container.appendChild(img);
-  log("QRCode PIX gerado.");
+      // Calculando o valor ajustado com base nos parâmetros DRAPP
+      const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
 
-  // Monitorando o mint
-  await DAQEngine.mintMonitor(amountWei, key, note);
-});
-</script>
+      // Gerando QRCode PIX
+      const brcode = `000201...valor${amount}...chave${key}...note${note}`;
+      const img = document.createElement("img");
+      img.src = "https://api.qrserver.com/v1/create-qr-code/?size=225x225&data=" + encodeURIComponent(brcode);
+      const container = document.getElementById("pixQRContainer");
+      container.innerHTML = ""; 
+      container.appendChild(img);
+      log("QRCode PIX gerado.");
+
+      // Monitorando o mint
+      await DAQEngine.mintMonitor(amountWei, key, note);
+    });
+  </script>
 </body>
 </html>
