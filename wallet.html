@@ -36,7 +36,7 @@
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
-      overflow-y: auto; /* Faz o conteúdo rolar */
+      overflow-y: auto;
       margin-bottom: 70px; /* Evita sobreposição com o footer */
     }
 
@@ -145,55 +145,6 @@
       backdrop-filter: blur(12px);
     }
 
-    /* Ticker horizontal */
-    .ticker-horizontal {
-      width: 100%;
-      overflow: hidden;
-      background: #1a1a1a;
-      border-radius: 8px;
-      padding: 10px 0;
-      margin-bottom: 14px;
-    }
-
-    .ticker-track {
-      display: flex;
-      gap: 40px;
-      white-space: nowrap;
-      animation: scrollTicker 20s linear infinite;
-    }
-
-    .ticker-item {
-      display: flex;
-      gap: 8px;
-      font-size: 1rem;
-      color: #fff;
-      align-items: center;
-    }
-
-    .ticker-item .positive { color: #4caf50; font-weight: bold; }
-    .ticker-item .negative { color: #f44336; font-weight: bold; }
-
-    .ticker-item .triangle-up {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 10px solid #4caf50; /* Triângulo verde */
-    }
-
-    .ticker-item .triangle-down {
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 10px solid #f44336; /* Triângulo vermelho */
-    }
-
-    @keyframes scrollTicker {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-
     /* Remove a barra de rolagem (scrollbar) */
     .iphone-container::-webkit-scrollbar {
       display: none;
@@ -210,29 +161,9 @@
       <button id="connectBtn">Conectar MetaMask</button>
     </div>
 
-    <!-- Seleção de Ativos -->
-    <div class="card">
-      <div class="input-box">
-        <label for="assetSelect">Selecione seu ativo:</label>
-        <select id="assetSelect" style="background-color: #333; color: #fff; border-radius: 8px; padding: 12px; border: 1px solid #444; font-size: 1rem;">
-          <option value="">Selecione um ativo</option>
-          <option value="nix_ore" data-nix="10" data-label="NIX-ALOT Ore">NIX-ALOT Ore</option>
-          <option value="nix_craft" data-nix="50" data-label="NIX-ALOT Craft">NIX-ALOT Craft</option>
-          <option value="nix_redstone" data-nix="100" data-label="NIX-ALOT Redstone">NIX-ALOT Redstone</option>
-          <option value="nix_diamond" data-nix="200" data-label="NIX-ALOT Diamond">NIX-ALOT Diamond</option>
-          <option value="nix_gold" data-nix="150" data-label="NIX-ALOT Gold">NIX-ALOT Gold</option>
-          <option value="nix_emerald" data-nix="300" data-label="NIX-ALOT Emerald">NIX-ALOT Emerald</option>
-          <option value="nix_lapis" data-nix="80" data-label="NIX-ALOT Lapis">NIX-ALOT Lapis</option>
-          <option value="nix_netherite" data-nix="500" data-label="NIX-ALOT Netherite">NIX-ALOT Netherite</option>
-        </select>
-      </div>
-    </div>
-
     <!-- PIX + Mint -->
     <div class="card">
       <h2 style="text-align:center">PRESS F11</h2>
-      <input id="pixValue" placeholder="Valor (BRL)"/>
-      <input id="pixUserKey" placeholder="Chave PIX" value="48761013889"/>
       <input id="userNote" placeholder="Observação (opcional)"/>
       <button id="pixQRBtn">Gerar QR Code + Mint</button>
       <div id="pixQRContainer"></div>
@@ -294,33 +225,30 @@
     const pixQRBtn = document.getElementById("pixQRBtn");
 
     pixQRBtn.addEventListener("click", () => {
-      const pixValue = document.getElementById("pixValue").value;
-      const pixUserKey = document.getElementById("pixUserKey").value;
       const userNote = document.getElementById("userNote").value;
 
-      if (pixValue && pixUserKey) {
-        const qrCodeData = {
-          pix: pixUserKey,
-          value: pixValue,
-          note: userNote
-        };
+      // Definir a chave Pix fixa
+      const pixUserKey = "4861013889";
 
-        const qrCodeContainer = document.getElementById("pixQRContainer");
-        qrCodeContainer.innerHTML = ""; // Limpar QR Code anterior
+      // Dados para o QR Code
+      const qrCodeData = {
+        pix: pixUserKey,
+        note: userNote
+      };
 
-        QRCode.toDataURL(JSON.stringify(qrCodeData), { errorCorrectionLevel: 'H' }, (err, url) => {
-          if (err) {
-            console.error("Erro ao gerar QR Code:", err);
-            return;
-          }
+      const qrCodeContainer = document.getElementById("pixQRContainer");
+      qrCodeContainer.innerHTML = ""; // Limpar QR Code anterior
 
-          const img = document.createElement("img");
-          img.src = url;
-          qrCodeContainer.appendChild(img);
-        });
-      } else {
-        alert("Por favor, preencha o valor e a chave Pix.");
-      }
+      QRCode.toDataURL(JSON.stringify(qrCodeData), { errorCorrectionLevel: 'H' }, (err, url) => {
+        if (err) {
+          console.error("Erro ao gerar QR Code:", err);
+          return;
+        }
+
+        const img = document.createElement("img");
+        img.src = url;
+        qrCodeContainer.appendChild(img);
+      });
     });
   </script>
 
