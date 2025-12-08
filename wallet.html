@@ -120,7 +120,38 @@
       max-width: 100%;
       height: auto;
     }
+* Ticker horizontal */
+.ticker-horizontal {
+  width: 100%;
+  overflow: hidden;
+  background:#1a1a1a;
+  border-radius:8px;
+  padding:10px 0;
+  margin-bottom:14px;
+}
 
+.ticker-track {
+  display: flex;
+  gap:40px;
+  white-space: nowrap;
+  animation: scrollTicker 20s linear infinite;
+}
+
+.ticker-item {
+  display: flex;
+  gap:8px;
+  font-size:.95rem;
+  color:#fff;
+  align-items:center;
+}
+
+.ticker-item .positive { color:#4caf50; font-weight:bold; }
+.ticker-item .negative { color:#f44336; font-weight:bold; }
+
+@keyframes scrollTicker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
     /* Footer */
     .footer {
       width: 100%;
@@ -186,7 +217,12 @@
       <button id="pixQRBtn">Gerar QR Code + Mint</button>
       <div id="pixQRContainer"></div>
     </div>
-
+ <!-- Ticker Horizontal -->
+  <div class="ticker-horizontal">
+    <div class="ticker-track" id="tickerTrack">
+      <!-- Itens serão gerados via JS -->
+    </div>
+  </div>
     <!-- Logs -->
     <div class="card">
       <pre id="log">RUNNING HORIGAMI SUIT 6G.01 ...</pre>
@@ -203,6 +239,34 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode"></script>
 
   <script>
+    // -------- Ticker Horizontal --------
+const assets = {
+  "NIX-ALOT Ore":2, "NIX-ALOT Craft":5, "NIX-ALOT Redstone":10, "NIX-ALOT Diamond":20,
+  "NIX-ALOT Gold":15, "NIX-ALOT Emerald":30, "NIX-ALOT Lapis":8, "NIX-ALOT Netherite":50
+};
+const usdToBrl = 5.0;
+let lastValues = {...assets};
+
+function updateTickerHorizontal(){
+  const track = document.getElementById("tickerTrack");
+  track.innerHTML = "";
+
+  for(const [label, usd] of Object.entries(assets)){
+    const changePercent = (Math.random()*0.1-0.05);
+    const newUsd = Math.max(0, lastValues[label]*(1+changePercent));
+    const brlValue = newUsd * usdToBrl;
+    const diff = newUsd - lastValues[label];
+    lastValues[label] = newUsd;
+
+    const trendClass = diff>=0 ? "positive" : "negative";
+    const trendSymbol = diff>=0 ? "▲" : "▼";
+
+    const item = document.createElement("div");
+    item.className = "ticker-item";
+    item.innerHTML = `${label}: <span class="${trendClass}">${trendSymbol} R$ ${brlValue.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>`;
+    track.appendChild(item);
+  }
+}
     const connectBtn = document.getElementById("connectBtn");
     const walletAddrEl = document.getElementById("walletAddr");
     const notification = document.getElementById("notification");
