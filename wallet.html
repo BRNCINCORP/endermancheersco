@@ -206,59 +206,10 @@
 
 <!-- Conectar Carteira -->
 <div class="card">
-  <button id="connectBtn">Conectar Carteira</button>
+  <button id="connectBtn">meta mask /button>
   <div id="walletAddr" class="small">Status: desconectado</div>
 </div>
 
-<script>
-  const connectBtn = document.getElementById("connectBtn");
-  const walletAddrEl = document.getElementById("walletAddr");
-
-  // Verificar se o MetaMask está instalado
-  if (typeof window.ethereum === "undefined") {
-    connectBtn.disabled = true;
-    walletAddrEl.textContent = "MetaMask não detectado. Por favor, instale a carteira.";
-  }
-
-  // Função para conectar a MetaMask
-  async function connectWallet() {
-    try {
-      // Solicitar ao usuário que se conecte à MetaMask
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-
-      // Exibir o endereço da carteira conectada
-      const userAddress = accounts[0];
-      walletAddrEl.textContent = `Conectado: ${userAddress}`;
-
-      // Alterar o status do botão
-      connectBtn.textContent = "Desconectar Carteira";
-
-      // Listener para quando a conta ou rede mudar
-      window.ethereum.on("accountsChanged", (accounts) => {
-        walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
-      });
-
-      window.ethereum.on("chainChanged", (chainId) => {
-        console.log("Rede mudada:", chainId);
-        // Você pode atualizar a rede ou fazer outras ações quando mudar a rede.
-      });
-
-    } catch (error) {
-      walletAddrEl.textContent = "Erro ao conectar à MetaMask";
-      console.error(error);
-    }
-  }
-
-  // Evento de clique no botão
-  connectBtn.addEventListener("click", () => {
-    if (connectBtn.textContent === "Conectar Carteira") {
-      connectWallet();
-    } else {
-      walletAddrEl.textContent = "Status: desconectado";
-      connectBtn.textContent = "Conectar Carteira";
-    }
-  });
-</script>
 
 
     <!-- Seleção de Ativos -->
@@ -305,8 +256,69 @@
 
     <footer class="footer">© CEO LUCAS JANUARIO BRNC INC ®</footer>
   </div>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
+
+<!-- Conectar Carteira -->
+<div class="card">
+  <button id="connectBtn">Conectar Carteira</button>
+  <div id="walletAddr" class="small">Status: desconectado</div>
+</div>
+
+<!-- Ticker de Ativos -->
+<div id="tickerTrack"></div>
 
 <script>
+// -------- Conexão MetaMask --------
+const connectBtn = document.getElementById("connectBtn");
+const walletAddrEl = document.getElementById("walletAddr");
+
+// Verificar se o MetaMask está instalado
+if (typeof window.ethereum === "undefined") {
+  connectBtn.disabled = true;
+  walletAddrEl.textContent = "MetaMask não detectado. Por favor, instale a carteira.";
+}
+
+// Função para conectar a MetaMask
+async function connectWallet() {
+  try {
+    // Solicitar ao usuário que se conecte à MetaMask
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+
+    // Exibir o endereço da carteira conectada
+    const userAddress = accounts[0];
+    walletAddrEl.textContent = `Conectado: ${userAddress}`;
+
+    // Alterar o status do botão
+    connectBtn.textContent = "Desconectar Carteira";
+
+    // Listener para quando a conta ou rede mudar
+    window.ethereum.on("accountsChanged", (accounts) => {
+      walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
+    });
+
+    window.ethereum.on("chainChanged", (chainId) => {
+      console.log("Rede mudada:", chainId);
+      // Você pode atualizar a rede ou fazer outras ações quando mudar a rede.
+    });
+
+  } catch (error) {
+    walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+    console.error(error);
+  }
+}
+
+// Evento de clique no botão
+connectBtn.addEventListener("click", () => {
+  if (connectBtn.textContent === "Conectar Carteira") {
+    connectWallet();
+  } else {
+    walletAddrEl.textContent = "Status: desconectado";
+    connectBtn.textContent = "Conectar Carteira";
+  }
+});
+
+// -------- Funções do Ticker --------
+
 // Função para buscar o valor do Dólar em tempo real
 async function fetchDollarPrice() {
   const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
@@ -314,7 +326,7 @@ async function fetchDollarPrice() {
   return data.rates.BRL;
 }
 
-// Atualizar o ticker com o valor dos ativos com base no preço do dólar
+// Função para atualizar o ticker com o valor dos ativos com base no preço do dólar
 async function updateTicker() {
   const dollarPrice = await fetchDollarPrice();
   const tickerTrack = document.getElementById('tickerTrack');
@@ -324,25 +336,33 @@ async function updateTicker() {
     return;
   }
 
-  const assetSelect = document.getElementById('assetSelect');
-  const selectedOption = assetSelect.options[assetSelect.selectedIndex];
+  // Supondo que você tenha uma lista de ativos
+  const assets = {
+    "NIX-ALOT Ore": 2,
+    "NIX-ALOT Craft": 5,
+    "NIX-ALOT Redstone": 10,
+    "NIX-ALOT Diamond": 20,
+    "NIX-ALOT Gold": 15,
+    "NIX-ALOT Emerald": 30,
+    "NIX-ALOT Lapis": 8,
+    "NIX-ALOT Netherite": 50
+  };
 
-  if (selectedOption.value) {
-    const assetValue = parseInt(selectedOption.getAttribute('data-nix'));
+  for (const [label, assetValue] of Object.entries(assets)) {
     const priceInBRL = (assetValue * dollarPrice).toFixed(2);
 
     const tickerElement = document.createElement('div');
     tickerElement.classList.add('ticker-item');
 
     const symbol = document.createElement('span');
-    symbol.textContent = `${selectedOption.getAttribute('data-label')}:`;
+    symbol.textContent = `${label}:`;
 
     const price = document.createElement('span');
     price.classList.add('positive');
     price.textContent = `R$ ${priceInBRL}`;
 
     const change = document.createElement('span');
-    change.textContent = '↑ 0.3%';
+    change.textContent = '↑ 0.3%';  // Pode ser ajustado para mostrar variações reais
 
     const triangle = document.createElement('div');
     triangle.classList.add('triangle-up');
@@ -352,7 +372,6 @@ async function updateTicker() {
     tickerElement.appendChild(change);
     tickerElement.appendChild(triangle);
 
-    tickerTrack.innerHTML = '';  // Limpa o ticker
     tickerTrack.appendChild(tickerElement);
   }
 }
@@ -360,6 +379,8 @@ async function updateTicker() {
 // Atualizar o ticker a cada 10 segundos
 setInterval(updateTicker, 10000);
 updateTicker();  // Chama a função para atualizar imediatamente na primeira vez
+
 </script>
+
 </body>
 </html>
