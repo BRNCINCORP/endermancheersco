@@ -260,7 +260,7 @@
 
 <!-- Conectar Carteira -->
 <div class="card">
-  <button id="connectBtn">Conectar Carteira</button>
+  <button id="connectBtn"></button>
   <div id="walletAddr" class="small">Status: desconectado</div>
 </div>
 
@@ -275,7 +275,7 @@ const walletAddrEl = document.getElementById("walletAddr");
 // Verificar se o MetaMask está instalado
 if (typeof window.ethereum === "undefined") {
   connectBtn.disabled = true;
-  walletAddrEl.textContent = "MetaMask não detectado. Por favor, instale a carteira.";
+  walletAddrEl.textContent = "MetaMask não detectado. ";
 }
 
 // Função para conectar a MetaMask
