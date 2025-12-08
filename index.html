@@ -299,6 +299,11 @@
   </div>
 </div>
 
+<!-- Banner de apresentação -->
+<div class="presentation-image">
+  <img src="baner.jpeg" alt="Imagem de apresentação">
+</div>
+
 <!-- Estilos (adicione ao seu CSS ou dentro de <style>) -->
 <style>
   .content-wrapper {
@@ -308,6 +313,7 @@
     color: #fff;
     font-family: Arial, sans-serif;
     text-align: center; /* mantém o parágrafo centralizado */
+    position: relative;
   }
 
   .button-center {
@@ -330,14 +336,21 @@
 
   .btn-wallet:active { transform: translateY(1px); }
   .btn-wallet:hover { box-shadow: 0 10px 24px rgba(0,0,0,0.55); }
-</style>
 
-            
-        </div>
-        <div class="presentation-image">
-            <img src="baner.jpeg" alt="Imagem de apresentação">
-        </div>
-    </div>
+  /* Ajuste do banner */
+  .presentation-image {
+    width: 100%;
+    height: auto;
+    background-color: #000; /* Altere para a cor de fundo desejada */
+    position: relative;
+  }
+
+  .presentation-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
 
     <!-- Seção de Notícias -->
     <h2 style="text-align: center; color: #ff4500;">Notícias e Atualizações</h2>
