@@ -35,6 +35,7 @@
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
+      overflow-y: scroll; /* Faz o conteúdo rolar */
     }
 
     /* Título da página */
@@ -271,7 +272,7 @@ async function fetchDollarPrice() {
   }
 }
 
-// Ticker de preços
+// Atualizar o ticker com o valor dos ativos com base no preço do dólar
 async function updateTicker() {
   const dollarPrice = await fetchDollarPrice();
   const tickerTrack = document.getElementById('tickerTrack');
@@ -281,36 +282,37 @@ async function updateTicker() {
     return;
   }
 
-  const tickerData = [
-    { symbol: 'USD/BRL', price: dollarPrice, change: 0.3, isPositive: true },
-  ];
+  const assetSelect = document.getElementById('assetSelect');
+  const selectedOption = assetSelect.options[assetSelect.selectedIndex];
 
-  tickerTrack.innerHTML = ''; // Limpa o ticker antes de adicionar novos itens
+  if (selectedOption.value) {
+    const assetValue = parseInt(selectedOption.getAttribute('data-nix'));
+    const priceInBRL = (assetValue * dollarPrice).toFixed(2);
 
-  tickerData.forEach(item => {
     const tickerElement = document.createElement('div');
     tickerElement.classList.add('ticker-item');
 
     const symbol = document.createElement('span');
-    symbol.textContent = `${item.symbol}:`;
+    symbol.textContent = `${selectedOption.getAttribute('data-label')}:`;
 
     const price = document.createElement('span');
-    price.classList.add(item.isPositive ? 'positive' : 'negative');
-    price.textContent = `R$ ${item.price.toFixed(2)}`;
+    price.classList.add('positive');
+    price.textContent = `R$ ${priceInBRL}`;
 
     const change = document.createElement('span');
-    change.textContent = `${item.isPositive ? '↑' : '↓'} ${item.change.toFixed(1)}%`;
+    change.textContent = '↑ 0.3%';
 
     const triangle = document.createElement('div');
-    triangle.classList.add(item.isPositive ? 'triangle-up' : 'triangle-down');
+    triangle.classList.add('triangle-up');
 
     tickerElement.appendChild(symbol);
     tickerElement.appendChild(price);
     tickerElement.appendChild(change);
     tickerElement.appendChild(triangle);
 
+    tickerTrack.innerHTML = '';  // Limpa o ticker
     tickerTrack.appendChild(tickerElement);
-  });
+  }
 }
 
 // Atualizar o ticker a cada 10 segundos
