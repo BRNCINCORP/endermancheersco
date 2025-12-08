@@ -1,156 +1,183 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<link rel="icon" href="logo.ico" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Enderman Cheers Wallet</title>
-<style>
-  /* Estilos globais */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #121212; /* Fundo escuro */
-    color: #fff; /* Texto claro */
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-  }
+  <meta charset="utf-8"/>
+  <link rel="icon" href="logo.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Enderman Cheers Wallet</title>
+  <style>
+    /* Estilos globais */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212; /* Fundo escuro */
+      color: #fff; /* Texto claro */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
 
-  /* Container que simula a tela do iPhone 15 */
-  .iphone-container {
-    width: 375px; /* Largura do iPhone 15 */
-    height: 812px; /* Altura do iPhone 15 */
-    background-color: #1c1c1c;
-    border-radius: 50px; /* Borda arredondada */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Sombra para dar efeito realista */
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  /* Título da página */
-  h1 {
-    font-size: 1.8rem;
-    color: #4CAF50;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  /* Card com bordas arredondadas */
-  .card {
-    background-color: #1c1c1c;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Estilizando o botão de conexão */
-  #connectBtn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-  }
-
-  #connectBtn:hover {
-    background-color: #45a049;
-  }
-
-  /* Estilizando a área de texto que mostra o status da carteira */
-  #walletAddr {
-    font-size: 1.2rem;
-    color: #fff;
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  /* Inputs com bordas arredondadas e fundo escuro */
-  input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid #444;
-    background-color: #333;
-    color: #fff;
-    font-size: 1rem;
-  }
-
-  /* Estilizando o botão de PIX + Mint */
-  #pixQRBtn {
-    background-color: #1db954;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-  }
-
-  #pixQRBtn:hover {
-    background-color: #1d9d50;
-  }
-
-  /* Exibindo o QR Code gerado */
-  #pixQRContainer img {
-    margin-top: 20px;
-    max-width: 100%;
-    height: auto;
-  }
-
-  /* Logs - área de exibição de logs */
-  #log {
-    background-color: #1c1c1c;
-    color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    font-size: 1rem;
-    max-height: 200px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    margin-top: 10px;
-  }
-
-  /* Estilizando o footer */
-  footer {
-    background-color: #121212;
-    color: #fff;
-    padding: 20px;
-    text-align: center;
-    font-size: 0.9rem;
-    border-top: 1px solid #444;
-    margin-top: 40px;
-  }
-
-  /* Ajustes para dispositivos móveis */
-  @media (max-width: 768px) {
+    /* Container que simula a tela do iPhone 15, responsivo */
     .iphone-container {
-      width: 350px;
-      height: 750px;
+      width: 90vw; /* Usa 90% da largura da tela */
+      max-width: 400px; /* Limita a largura máxima */
+      height: 90vh; /* Usa 90% da altura da tela */
+      max-height: 800px; /* Limita a altura máxima */
+      background-color: #1c1c1c;
+      border-radius: 20px; /* Borda arredondada */
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Sombra para dar efeito realista */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
     }
 
+    /* Título da página */
     h1 {
-      font-size: 1.5rem;
+      font-size: 2rem;
+      color: #4CAF50;
+      margin-bottom: 20px;
+      text-align: center;
+      word-wrap: break-word;
     }
-  }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
-</head>
 
+    /* Card com bordas arredondadas */
+    .card {
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Estilizando o botão de conexão */
+    #connectBtn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    #connectBtn:hover {
+      background-color: #45a049;
+    }
+
+    /* Estilizando a área de texto que mostra o status da carteira */
+    #walletAddr {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* Inputs com bordas arredondadas e fundo escuro */
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #333;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    /* Estilizando o botão de PIX + Mint */
+    #pixQRBtn {
+      background-color: #1db954;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    #pixQRBtn:hover {
+      background-color: #1d9d50;
+    }
+
+    /* Exibindo o QR Code gerado */
+    #pixQRContainer img {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Logs - área de exibição de logs */
+    #log {
+      background-color: #1c1c1c;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 10px;
+    }
+
+    /* Estilizando o footer */
+    footer {
+      background-color: #121212;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid #444;
+      margin-top: 40px;
+    }
+
+    /* Ajustes para dispositivos móveis */
+    @media (max-width: 768px) {
+      .iphone-container {
+        width: 90vw;
+        height: 85vh;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      /* Ajusta o tamanho dos botões e inputs em telas menores */
+      #connectBtn, #pixQRBtn, input {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Ajustes para telas pequenas (celulares) */
+    @media (max-width: 480px) {
+      .iphone-container {
+        width: 95vw;
+        height: 80vh;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      /* Menor tamanho de botões e inputs para telas muito pequenas */
+      #connectBtn, #pixQRBtn, input {
+        padding: 8px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
 <body>
   <div class="iphone-container">
     <h1>ENDERMAN CHEERS WALLET</h1>
@@ -220,23 +247,6 @@ async function sha256Hex(text){
   const enc=new TextEncoder().encode(text);
   const hash=await crypto.subtle.digest("SHA-256",enc);
   return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
-}
-
-// Cálculos com base no modelo 6G Tauros V5 (Peso Dinâmico)
-function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
-  let peso = Math.exp(-ADR * VArh) * Math.pow(1 + VArh, -1) * r * Math.exp(-a * u) / ((1 + b * u) * (1 + k * A(t)));
-  return peso;
-}
-
-// Normalização dos Pesos
-function normalizarPeso(pesos) {
-  let somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
-  return pesos.map(peso => peso / somaPesos);
-}
-
-// Peso normalizado
-function calcularPesoNormalizado(pesosDinamicos) {
-  return normalizarPeso(pesosDinamicos);
 }
 
 // Função para calcular o valor de mint com base no modelo
