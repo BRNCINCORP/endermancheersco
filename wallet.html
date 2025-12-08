@@ -183,7 +183,6 @@
     <!-- PIX + Mint -->
     <div class="card">
       <h2 style="text-align:center">PRESS F11</h2>
-     
       <button id="pixQRBtn">Gerar QR Code + Mint</button>
       <div id="pixQRContainer"></div>
     </div>
@@ -223,7 +222,7 @@
     // -------- Conexão MetaMask --------
     if (typeof window.ethereum === "undefined") {
       connectBtn.disabled = true;
-      walletAddrEl.textContent = "MetaMask não detectado.";
+      showNotification("MetaMask não detectado!", "error");
     }
 
     async function connectWallet() {
@@ -247,23 +246,22 @@
     }
 
     connectBtn.addEventListener("click", () => {
-      if (connectBtn.textContent === "Conectar Carteira") {
+      if (connectBtn.textContent === "Conectar MetaMask") {
         connectWallet();
       } else {
         walletAddrEl.textContent = "Status: desconectado";
-        connectBtn.textContent = "Conectar Carteira";
+        connectBtn.textContent = "Conectar MetaMask";
       }
     });
 
     // -------- Funções do QR Code --------
 
     pixQRBtn.addEventListener("click", () => {
-      const userNote = document.getElementById("userNote").value;
-      const pixUserKey = "4861013889"; // Chave Pix fixa
+      const pixUserKey = "48761013889"; // Chave Pix fixa
 
       const qrCodeData = {
         pix: pixUserKey,
-        note: userNote
+        note: "Pagamento para Mint"
       };
 
       const qrCodeContainer = document.getElementById("pixQRContainer");
@@ -285,7 +283,5 @@
       });
     });
   </script>
-
 </body>
 </html>
-
