@@ -208,6 +208,8 @@
     const notification = document.getElementById("notification");
     const pixQRBtn = document.getElementById("pixQRBtn");
 
+    let isWalletConnected = false; // Flag para verificar a conexão com a carteira
+
     // Função de notificação
     function showNotification(message, type) {
       notification.textContent = message;
@@ -231,6 +233,7 @@
         const userAddress = accounts[0];
         walletAddrEl.textContent = `Conectado: ${userAddress}`;
         connectBtn.textContent = "Desconectar Carteira";
+        isWalletConnected = true; // Marca que a carteira foi conectada
         showNotification("Conectado à MetaMask com sucesso!", "success");
         window.ethereum.on("accountsChanged", (accounts) => {
           walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
@@ -251,16 +254,19 @@
       } else {
         walletAddrEl.textContent = "Status: desconectado";
         connectBtn.textContent = "Conectar MetaMask";
+        isWalletConnected = false;
       }
     });
 
     // -------- Funções do QR Code --------
-
     pixQRBtn.addEventListener("click", () => {
-      const pixUserKey = "48761013889"; // Chave Pix fixa
+      if (!isWalletConnected) {
+        showNotification("Por favor, conecte a MetaMask primeiro!", "error");
+        return;
+      }
 
       const qrCodeData = {
-        pix: pixUserKey,
+        pix: "4861013889",  // Chave Pix
         note: "Pagamento para Mint"
       };
 
@@ -283,5 +289,6 @@
       });
     });
   </script>
+
 </body>
 </html>
