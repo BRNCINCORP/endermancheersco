@@ -304,13 +304,26 @@ async function sha256Hex(text){
   return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-// Função para calcular o valor de mint com base no modelo
+// Função para calcular o peso dinâmico baseado no DRAPP
+async function calcularPesoDinamico(ADR, VArh, r, b, k, u) {
+  // Cálculo usando os parâmetros DRAPP conforme a equação fornecida
+  let pesoDinamico = ADR * Math.exp(-ADR * r) * (1 + VArh) / (1 + Math.exp(k * u));
+  return pesoDinamico;
+}
+
+// Função para normalizar o peso
+async function calcularPesoNormalizado(pesos) {
+  const somaPesos = pesos.reduce((acc, peso) => acc + peso, 0);
+  return pesos.map(peso => peso / somaPesos);
+}
+
+// Função para calcular o valor de mint com base no modelo DRAPP
 async function calcularMintComPeso(amount, ADR, VArh, r, b, k, u) {
-  let pesoDinamico = calcularPesoDinamico(ADR, VArh, r, b, k, u);
-  let pesoNormalizado = calcularPesoNormalizado([pesoDinamico]);
+  let pesoDinamico = await calcularPesoDinamico(ADR, VArh, r, b, k, u);
+  let pesoNormalizado = await calcularPesoNormalizado([pesoDinamico]);
 
   const valorAjustado = amount * pesoNormalizado[0];
-  const amountWei = BigInt(Math.floor(valorAjustado * 1e15));
+  const amountWei = BigInt(Math.floor(valorAjustado * 1e15)); // Convertendo para wei
 
   log("Valor ajustado: " + valorAjustado);
   log("Mint com valor ajustado: " + amountWei);
@@ -330,6 +343,7 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
   if(isNaN(amount)){alert("Valor inválido."); return;}
 
+  // Parâmetros DRAPP
   const ADR = 0.5;
   const VArh = 0.7;
   const r = 0.1;
@@ -337,8 +351,10 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   const k = 0.03;
   const u = 0.5;
 
+  // Calculando o valor ajustado com base nos parâmetros DRAPP
   const amountWei = await calcularMintComPeso(amount, ADR, VArh, r, b, k, u);
 
+  // Gerando QRCode PIX
   const brcode = `000201...valor${amount}...chave${key}...note${note}`;
   const img = document.createElement("img");
   img.src = "https://api.qrserver.com/v1/create-qr-code/?size=225x225&data=" + encodeURIComponent(brcode);
@@ -347,8 +363,10 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   container.appendChild(img);
   log("QRCode PIX gerado.");
 
+  // Monitorando o mint
   await DAQEngine.mintMonitor(amountWei, key, note);
 });
 </script>
+
 </body>
 </html>
