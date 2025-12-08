@@ -85,6 +85,12 @@
       background-color: #333;
       color: #fff;
       font-size: 1.1rem;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Neon verde */
+    }
+
+    input::placeholder {
+      color: #8aff00; /* Verde neon para o placeholder */
+      text-shadow: 0 0 10px #8aff00; /* Neon */
     }
 
     /* Estilizando o botão de PIX + Mint */
@@ -134,6 +140,7 @@
       border-top: 2px solid #ff003c;
       backdrop-filter: blur(12px);
     }
+
     /* Ticker horizontal */
     .ticker-horizontal {
       width: 100%;
@@ -197,7 +204,7 @@
     <div class="card">
       <div class="input-box">
         <label for="assetSelect">Selecione seu ativo:</label>
-        <select id="assetSelect">
+        <select id="assetSelect" style="background-color: #333; color: #fff; border-radius: 8px; padding: 12px; border: 1px solid #444; font-size: 1rem;">
           <option value="">Selecione um ativo</option>
           <option value="nix_ore" data-nix="10" data-label="NIX-ALOT Ore">NIX-ALOT Ore</option>
           <option value="nix_craft" data-nix="50" data-label="NIX-ALOT Craft">NIX-ALOT Craft</option>
@@ -258,6 +265,7 @@
         const userAddress = accounts[0];
         walletAddrEl.textContent = `Conectado: ${userAddress}`;
         connectBtn.textContent = "Desconectar Carteira";
+        alert('Conectado à MetaMask com sucesso!'); // Notificação
         window.ethereum.on("accountsChanged", (accounts) => {
           walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
         });
@@ -266,6 +274,7 @@
         });
       } catch (error) {
         walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+        alert('Erro ao conectar à MetaMask!'); // Notificação de erro
         console.error(error);
       }
     }
