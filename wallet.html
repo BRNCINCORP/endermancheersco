@@ -207,6 +207,35 @@
       font-size: 1rem;
       border: 1px solid #444;
     }
+    .ticker-item .positive { color: #4caf50; font-weight: bold; }
+    .ticker-item .negative { color: #f44336; font-weight: bold; }
+
+    @keyframes scrollTicker {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Estilos do input box de ativo */
+    .input-box {
+      margin-bottom: 20px;
+    }
+
+    .input-box label {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      display: block;
+      color: #fff;
+    }
+
+    .input-box select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #333;
+      color: #fff;
+      font-size: 1rem;
+      border: 1px solid #444;
+    }
   </style>
 </head>
 <body>
@@ -234,6 +263,15 @@
           <option value="nix_lapis" data-nix="80" data-label="NIX-ALOT Lapis">NIX-ALOT Lapis</option>
           <option value="nix_netherite" data-nix="500" data-label="NIX-ALOT Netherite">NIX-ALOT Netherite</option>
         </select>
+      </div>
+    </div>
+
+    <!-- Ticker horizontal -->
+    <div class="card">
+      <div class="ticker-horizontal">
+        <div class="ticker-track" id="tickerTrack">
+          <!-- Os dados do ticker serão gerados via JS -->
+        </div>
       </div>
     </div>
 
