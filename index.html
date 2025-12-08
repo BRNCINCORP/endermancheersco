@@ -180,27 +180,78 @@ h1, p, h2 {
    FOOTER
 ========================== */
 footer {
-    background-color: #101010;
-    padding: 40px 25px;
+    background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+    border-top: 2px solid #f7d200; /* amarelo neon */
+    padding: 45px 30px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 25px;
-    color: #ddd;
-    border-top: 1px solid #222;
+    gap: 30px;
+    color: #f7d200; /* texto amarelo neon */
+    box-shadow: 0 -4px 18px rgba(247, 210, 0, 0.55); /* brilho amarelo */
+    position: relative;
+    overflow: hidden;
 }
 
+/* Linhas neon animadas */
+footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -20%;
+    width: 140%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #f7d200, transparent);
+    animation: cyberline 3s linear infinite;
+    opacity: 0.8;
+}
+
+@keyframes cyberline {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Título / Marca */
 footer .brand {
-    font-size: 22px;
-    font-weight: bold;
-    color: #ff4500;
-    text-shadow: 0 0 8px rgba(255,0,0,0.4);
+    font-size: 24px;
+    font-weight: 900;
+    color: #f7d200;
+    text-shadow: 
+        0 0 8px #f7d200,
+        0 0 14px #ffea3d,
+        0 0 22px #ffe600;
+    letter-spacing: 1.3px;
 }
 
+/* Texto */
 footer .info-section p {
-    opacity: .7;
-    font-size: 14px;
+    color: #f7d200;
+    opacity: 0.85;
+    font-size: 15px;
+    text-shadow: 0 0 6px rgba(247, 210, 0, 0.55);
 }
+
+/* Links do footer */
+footer a {
+    color: #f7d200;
+    text-decoration: none;
+    font-weight: 600;
+    text-shadow: 0 0 6px #ffe600;
+    transition: 0.2s;
+}
+
+footer a:hover {
+    color: #fff;
+    text-shadow: 0 0 12px #f7d200, 0 0 18px #ffe600;
+    letter-spacing: 0.8px;
+}
+
+/* Divisórias futuristas */
+footer .column {
+    border-left: 2px solid rgba(247, 210, 0, 0.3);
+    padding-left: 15px;
+}
+
 </style>
 
 </head>
@@ -361,14 +412,8 @@ footer .info-section p {
             <p>BUY YOUR VIP ON PADDOCK INVESTR <p>
             <a href="https://discord.gg/T7tbujr9bk" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Saiba mais</a>
         </div>
-        <div class="card">
-            <img src="exemplo.jpg" alt="Imagem da Notícia 2" style="width: 100%; height: auto; border-radius: 10px;">
-            <h2>top trade 2026</h2>
-            <p>expoloit meta trade </p>
-            <a href="https://discord.gg/T7tbujr9bk" style="background-color: green; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Saiba mais</a>
-        </div>
     
-
+    
         <!-- Adicionar mais cards conforme necessário -->
     </div>
 
