@@ -235,6 +235,10 @@
         connectBtn.textContent = "Desconectar Carteira";
         isWalletConnected = true; // Marca que a carteira foi conectada
         showNotification("Conectado à MetaMask com sucesso!", "success");
+
+        // Exibe o botão para gerar o QR Code depois de conectar
+        pixQRBtn.style.display = "block"; // Torna o botão visível
+
         window.ethereum.on("accountsChanged", (accounts) => {
           walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
         });
@@ -255,6 +259,7 @@
         walletAddrEl.textContent = "Status: desconectado";
         connectBtn.textContent = "Conectar MetaMask";
         isWalletConnected = false;
+        pixQRBtn.style.display = "none"; // Esconde o botão de gerar QR Code
       }
     });
 
