@@ -5,10 +5,142 @@
 <link rel="icon" href="logo.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Enderman Cheers Wallet</title>
-
 <style>
-  /* Mantendo o estilo do layout */
+  /* Definindo um fundo escuro e texto claro para a página */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #121212; /* Fundo escuro */
+    color: #fff; /* Texto claro */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  /* Container principal */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Título da página */
+  h1 {
+    font-size: 2.5rem;
+    color: #4CAF50; /* Cor de destaque */
+    margin-bottom: 20px;
+  }
+
+  /* Cards para as seções */
+  .card {
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Estilizando o botão de conexão */
+  #connectBtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  #connectBtn:hover {
+    background-color: #45a049;
+  }
+
+  /* Estilizando a área de texto que mostra o status da carteira */
+  #walletAddr {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-top: 10px;
+  }
+
+  /* Inputs com bordas arredondadas e um fundo escuro */
+  input {
+    width: 80%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background-color: #333;
+    color: #fff;
+    font-size: 1rem;
+  }
+
+  /* Estilizando o botão de PIX + Mint */
+  #pixQRBtn {
+    background-color: #1db954;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  #pixQRBtn:hover {
+    background-color: #1d9d50;
+  }
+
+  /* Exibindo o QR Code gerado */
+  #pixQRContainer img {
+    margin-top: 20px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Logs - área de exibição de logs */
+  #log {
+    background-color: #1c1c1c;
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    margin-top: 10px;
+  }
+
+  /* Estilizando o footer */
+  footer {
+    background-color: #121212;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-top: 1px solid #444;
+    margin-top: 40px;
+  }
+
+  /* Ajustes para dispositivos móveis */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    input {
+      width: 100%;
+    }
+
+    #connectBtn, #pixQRBtn {
+      width: 100%;
+    }
+  }
 </style>
+
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
 </head>
