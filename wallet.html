@@ -202,11 +202,64 @@
   <div class="iphone-container">
     <h1>ENDERMAN CHEERS WALLET</h1>
 
-    <!-- Conectar Carteira -->
-    <div class="card">
-      <button id="connectBtn">Conectar Carteira</button>
-      <div id="walletAddr" class="small">Status: desconectado</div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0"></script>
+
+<!-- Conectar Carteira -->
+<div class="card">
+  <button id="connectBtn">Conectar Carteira</button>
+  <div id="walletAddr" class="small">Status: desconectado</div>
+</div>
+
+<script>
+  const connectBtn = document.getElementById("connectBtn");
+  const walletAddrEl = document.getElementById("walletAddr");
+
+  // Verificar se o MetaMask está instalado
+  if (typeof window.ethereum === "undefined") {
+    connectBtn.disabled = true;
+    walletAddrEl.textContent = "MetaMask não detectado. Por favor, instale a carteira.";
+  }
+
+  // Função para conectar a MetaMask
+  async function connectWallet() {
+    try {
+      // Solicitar ao usuário que se conecte à MetaMask
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      // Exibir o endereço da carteira conectada
+      const userAddress = accounts[0];
+      walletAddrEl.textContent = `Conectado: ${userAddress}`;
+
+      // Alterar o status do botão
+      connectBtn.textContent = "Desconectar Carteira";
+
+      // Listener para quando a conta ou rede mudar
+      window.ethereum.on("accountsChanged", (accounts) => {
+        walletAddrEl.textContent = `Conectado: ${accounts[0]}`;
+      });
+
+      window.ethereum.on("chainChanged", (chainId) => {
+        console.log("Rede mudada:", chainId);
+        // Você pode atualizar a rede ou fazer outras ações quando mudar a rede.
+      });
+
+    } catch (error) {
+      walletAddrEl.textContent = "Erro ao conectar à MetaMask";
+      console.error(error);
+    }
+  }
+
+  // Evento de clique no botão
+  connectBtn.addEventListener("click", () => {
+    if (connectBtn.textContent === "Conectar Carteira") {
+      connectWallet();
+    } else {
+      walletAddrEl.textContent = "Status: desconectado";
+      connectBtn.textContent = "Conectar Carteira";
+    }
+  });
+</script>
+
 
     <!-- Seleção de Ativos -->
     <div class="card">
