@@ -428,12 +428,36 @@ footer .column {
         <div class="info-section">
             <p>&copy; 2025 Enderman Cheers Co. Todos os direitos reservados.</p>
     </footer>
-
 <script>
 
-    // Função para atualizar os indicadores de variação com dados reais
+    // Força o layout como se fosse desktop
+    function forceDesktopMode() {
+        const minWidth = 1200;
+
+        // Travar zoom responsivo
+        const meta = document.querySelector("meta[name=viewport]");
+        if (meta) {
+            meta.setAttribute(
+                "content",
+                "width=" + minWidth + ", initial-scale=1.0, maximum-scale=1.0"
+            );
+        }
+
+        // Força largura mínima para evitar modo mobile
+        document.documentElement.style.minWidth = minWidth + "px";
+        document.body.style.minWidth = minWidth + "px";
+
+        // Impede media queries mobile
+        document.body.classList.add("force-desktop");
+    }
+
+    forceDesktopMode();
+
+    // ======================
+    // SEU CÓDIGO MANTIDO
+    // ======================
+
     async function updateMarketData() {
-        // Exemplo — substitua pela sua API real
         const data = await fetch('https://api.exemplo.com/market-data')
             .then(response => response.json());
 
@@ -447,7 +471,6 @@ footer .column {
         updateIndicator('prata', data.prata);
     }
 
-    // Função para atualizar a classe do indicador
     function updateIndicator(asset, value) {
         const indicator = document.querySelector(
             `.market-info-navbar .info span[data-asset="${asset}"] + .indicator`
@@ -469,49 +492,11 @@ footer .column {
         indicator.dataset.previousValue = value;
     }
 
-    // Atualização inicial e a cada 1 minuto
     updateMarketData();
     setInterval(updateMarketData, 60000);
 
-    // ============================
-    // BLOQUEIO MOBILE
-    // ============================
-    if (window.innerWidth < 900) {
-        document.body.innerHTML = `
-            <div style="
-                width: 100%;
-                height: 100vh;
-                background: #000;
-                color: #ff0000;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                font-family: Arial, sans-serif;
-                text-align: center;
-                padding: 30px;
-            ">
-                <h1 style="
-                    font-size: 32px;
-                    text-shadow: 0 0 12px #ff0000, 0 0 22px #ff4d4d;
-                ">
-                    🚫 ACESSO BLOQUEADO
-                </h1>
-
-                <p style="
-                    margin-top: 20px;
-                    font-size: 20px;
-                    max-width: 420px;
-                    text-shadow: 0 0 8px #ff0000;
-                ">
-                    Este site funciona apenas no modo <strong>Desktop</strong>.<br><br>
-                    Ative <strong>"Versão para computador"</strong> no seu navegador ou use um PC.
-                </p>
-            </div>
-        `;
-    }
-
 </script>
+
 
 
 </body>
